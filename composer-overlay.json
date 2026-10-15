@@ -1,0 +1,4 @@
+{
+  "require": {"php": "^8.2", "laravel/framework": "^12.0"},
+  "notes": "Merge this require into the composer.json of a fresh Laravel 12 app; do not replace the Laravel app composer.json with this file."
+}
