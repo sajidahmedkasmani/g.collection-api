@@ -21,67 +21,144 @@ class CheckoutController extends Controller
         return view('shop.checkout', compact('cart', 'total'));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $data = $request->validate([
+    //         'customer_name' => 'required|string|max:100',
+    //         'email' => 'required|email',
+    //         'phone' => 'required|string|max:20',
+    //         'address' => 'required|string',
+    //         'city' => 'required|string|max:50',
+    //         'payment_method' => 'required|in:cod,bank_transfer',
+    //         'notes' => 'nullable|string',
+    //     ]);
+
+    //     $cart = session()->get('cart', []);
+    //     if (empty($cart)) {
+    //         return back()->with('error', 'Cart is empty.');
+    //     }
+
+    //     $productIds = array_keys($cart);
+    //     $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+    //     $total = 0;
+    //     foreach ($cart as $id => $item) {
+    //         if (!isset($products[$id])) {
+    //             return back()->with('error', 'One product is no longer available.');
+    //         }
+    //         $total += $products[$id]->price * $item['quantity'];
+    //     }
+
+    //     DB::beginTransaction();
+    //     try {
+    //         $order = Order::create([
+    //             'order_number' => 'GC-' . strtoupper(Str::random(8)),
+    //             'customer_name' => $data['customer_name'],
+    //             'email' => $data['email'],
+    //             'phone' => $data['phone'],
+    //             'address' => $data['address'],
+    //             'city' => $data['city'],
+    //             'payment_method' => $data['payment_method'],
+    //             // 'notes' => $data['notes'] ?? null,
+    //             // 'total' => $total,
+    //             'customer_note' => $data['notes'] ?? null,
+    //             'subtotal_paisa' => (int) round($total * 100),
+    //             'status' => 'pending',
+    //         ]);
+
+    //         foreach ($cart as $id => $item) {
+    //             OrderItem::create([
+    //                 'order_id' => $order->id,
+    //                 'product_id' => $id,
+    //                 'product_name' => $products[$id]->name,
+    //                 'price' => $products[$id]->price,
+    //                 'quantity' => $item['quantity'],
+    //                 'unit_price_paisa' => (int) round($products[$id]->price * 100),
+    //                 'line_total_paisa' => (int) round($lineTotal * 100),
+    //             ]);
+    //         }
+
+    //         DB::commit();
+    //         session()->forget('cart');
+    //         return redirect()->route('order.success', $order->order_number);
+    //     // } catch (\Throwable $e) {
+    //     //     DB::rollBack();
+    //     //     return back()->with('error', 'Order failed. Try again.');
+    //     // }
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();
+    //         return back()->with('error', 'Order failed: ' . $e->getMessage() . ' | Line: ' . $e->getLine());
+    //     }
+    // }
+
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'customer_name' => 'required|string|max:100',
-            'email' => 'required|email',
-            'phone' => 'required|string|max:20',
-            'address' => 'required|string',
-            'city' => 'required|string|max:50',
-            'payment_method' => 'required|in:cod,bank_transfer',
-            'notes' => 'nullable|string',
+{
+    $data = $request->validate([
+        'customer_name' => 'required|string|max:100',
+        'email' => 'required|email',
+        'phone' => 'required|string|max:20',
+        'address' => 'required|string',
+        'city' => 'required|string|max:50',
+        'payment_method' => 'required|in:cod,bank_transfer',
+        'notes' => 'nullable|string',
+    ]);
+
+    $cart = session()->get('cart', []);
+    if (empty($cart)) {
+        return back()->with('error', 'Cart is empty.');
+    }
+
+    $productIds = array_keys($cart);
+    $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+    $total = 0;
+    foreach ($cart as $id => $item) {
+        if (!isset($products[$id])) {
+            return back()->with('error', 'One product is no longer available.');
+        }
+        $total += $products[$id]->price * $item['quantity'];
+    }
+
+    DB::beginTransaction();
+    try {
+        $order = Order::create([
+            'order_number' => 'GC-' . strtoupper(Str::random(8)),
+            'customer_name' => $data['customer_name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'address' => $data['address'],
+            'city' => $data['city'],
+            'payment_method' => $data['payment_method'],
+            'notes' => $data['notes'] ?? null,
+            'customer_note' => $data['notes'] ?? null,
+            'total' => $total,
+            'subtotal_paisa' => (int) round($total * 100),
+            'status' => 'pending',
         ]);
 
-        $cart = session()->get('cart', []);
-        if (empty($cart)) {
-            return back()->with('error', 'Cart is empty.');
-        }
-
-        $productIds = array_keys($cart);
-        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
-
-        $total = 0;
         foreach ($cart as $id => $item) {
-            if (!isset($products[$id])) {
-                return back()->with('error', 'One product is no longer available.');
-            }
-            $total += $products[$id]->price * $item['quantity'];
-        }
+            $unitPrice = (float) $products[$id]->price;
+            $lineTotal = $unitPrice * $item['quantity'];
 
-        DB::beginTransaction();
-        try {
-            $order = Order::create([
-                'order_number' => 'GC-' . strtoupper(Str::random(8)),
-                'customer_name' => $data['customer_name'],
-                'email' => $data['email'],
-                'phone' => $data['phone'],
-                'address' => $data['address'],
-                'city' => $data['city'],
-                'payment_method' => $data['payment_method'],
-                'notes' => $data['notes'] ?? null,
-                'total' => $total,
-                'status' => 'pending',
+            OrderItem::create([
+                'order_id' => $order->id,
+                'product_id' => $id,
+                'product_name' => $products[$id]->name,
+                'price' => $unitPrice,
+                'unit_price_paisa' => (int) round($unitPrice * 100),
+                'line_total_paisa' => (int) round($lineTotal * 100),
+                'quantity' => $item['quantity'],
             ]);
-
-            foreach ($cart as $id => $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $id,
-                    'product_name' => $products[$id]->name,
-                    'price' => $products[$id]->price,
-                    'quantity' => $item['quantity'],
-                ]);
-            }
-
-            DB::commit();
-            session()->forget('cart');
-            return redirect()->route('order.success', $order->order_number);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return back()->with('error', 'Order failed. Try again.');
         }
+
+        DB::commit();
+        session()->forget('cart');
+        return redirect()->route('order.success', $order->order_number);
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return back()->with('error', 'Order failed: ' . $e->getMessage());
     }
+}
 
     public function success($orderNumber)
     {
