@@ -27,6 +27,8 @@ Route::get('/order/success/{orderNumber}', [CheckoutController::class, 'success'
 
 // ===== ADMIN =====
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('products/import', [ProductController::class, 'importForm'])->name('products.import.form');
+    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::resource('products', ProductController::class);
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
@@ -34,6 +36,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
     Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    
 });
 
 require __DIR__.'/auth.php';

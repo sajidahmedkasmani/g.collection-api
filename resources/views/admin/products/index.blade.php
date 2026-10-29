@@ -16,7 +16,11 @@
             <a href="{{ route('admin.products.index') }}" class="text-sm text-gray-500 hover:underline">Clear</a>
         @endif
     </form>
-    <a href="{{ route('admin.products.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Product</a>
+    <div class="flex gap-2">
+        <a href="{{ route('admin.products.import.form') }}" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">Import CSV</a>
+        <a href="{{ route('admin.products.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Product</a>
+    </div>
+    <!-- <a href="{{ route('admin.products.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Product</a> -->
 </div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
