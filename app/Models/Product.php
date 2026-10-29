@@ -23,12 +23,21 @@ class Product extends Model
     }
 
     // Frontend display ke liye helper
+    // public function getDisplayImageAttribute(): ?string
+    // {
+    //     if ($this->image) {
+    //         return str_starts_with($this->image, 'http')
+    //             ? $this->image
+    //             : asset('storage/' . $this->image);
+    //     }
+    //     return $this->image_url;
+    // }
     public function getDisplayImageAttribute(): ?string
     {
         if ($this->image) {
             return str_starts_with($this->image, 'http')
                 ? $this->image
-                : asset('storage/' . $this->image);
+                : asset('uploads/' . $this->image);
         }
         return $this->image_url;
     }

@@ -36,7 +36,8 @@ class ProductController extends Controller
         $data['slug'] = Str::slug($data['name']) . '-' . Str::lower(Str::random(4));
 
         if ($request->hasFile('image_file')) {
-            $data['image'] = $request->file('image_file')->store('products', 'public');
+            // $data['image'] = $request->file('image_file')->store('products', 'public');
+            $data['image'] = $request->file('image_file')->store('products', 'uploads');
         }
 
         Product::create($data);
@@ -54,9 +55,12 @@ class ProductController extends Controller
 
         if ($request->hasFile('image_file')) {
             if ($product->image && !str_starts_with($product->image, 'http')) {
-                Storage::disk('public')->delete($product->image);
+                // Storage::disk('public')->delete($product->image);
+                Storage::disk('uploads')->delete($product->image);
+
             }
-            $data['image'] = $request->file('image_file')->store('products', 'public');
+            // $data['image'] = $request->file('image_file')->store('products', 'public');
+            $data['image'] = $request->file('image_file')->store('products', 'uploads');
         }
 
         $product->update($data);
@@ -66,7 +70,8 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         if ($product->image && !str_starts_with($product->image, 'http')) {
-            Storage::disk('public')->delete($product->image);
+            // Storage::disk('public')->delete($product->image);
+            Storage::disk('uploads')->delete($product->image);
         }
         $product->delete();
         return back()->with('success', 'Product deleted.');
