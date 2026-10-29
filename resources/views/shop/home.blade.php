@@ -4,13 +4,19 @@
 @section('content')
 @php
     $list = $products->values();
-    $ph = fn($p, $w = 600, $h = 800) => $p->display_image ?? ('https://placehold.co/'.$w.'x'.$h.'/F8DCE8/5B1A4A?text='.urlencode($p->name));
-    $cat = fn($p) => optional($p->category)->slug ?? '';
-    $slideProducts = $list->take(3);
     $first = $list->get(0);
     $p1 = $list->get(1) ?? $first;
     $p2 = $list->get(2) ?? $first;
     $p3 = $list->get(3) ?? $first;
+    $slideProducts = $list->take(3);
+
+    $ph = function($p, $w = 600, $h = 800) {
+        if (!$p) return 'https://placehold.co/'.$w.'x'.$h.'/F8DCE8/5B1A4A?text=Product';
+        if (!empty($p->display_image)) return $p->display_image;
+        return 'https://placehold.co/'.$w.'x'.$h.'/F8DCE8/5B1A4A?text='.urlencode($p->name ?? 'Product');
+    };
+
+    $cat = fn($p) => $p->category ?? '';
 @endphp
 
 {{-- ============ HERO SLIDER ============ --}}
@@ -36,18 +42,24 @@
                 </p>
                 <div class="flex flex-wrap gap-3">
                     <a href="{{ route('shop') }}" class="bg-white text-royal text-xs font-medium rounded-full px-6 py-3 hover:bg-blush transition">Shop collection</a>
-                    <a href="{{ route('product.show', $sp->slug) }}" class="border border-white/50 text-xs rounded-full px-6 py-3 hover:bg-white/10 transition">View look</a>
+                    @if($sp)
+                        <a href="{{ route('product.show', $sp->slug) }}" class="border border-white/50 text-xs rounded-full px-6 py-3 hover:bg-white/10 transition">View look</a>
+                    @endif
                 </div>
             </div>
             <div class="relative flex justify-center md:justify-end items-end gap-4">
-                <a href="{{ route('product.show', $sp->slug) }}" class="block w-56 md:w-72 aspect-[3/4] overflow-hidden arch bg-white/10">
-                    <img src="{{ $ph($sp) }}" alt="{{ $sp->name }}" class="w-full h-full object-cover" loading="lazy">
-                </a>
+                @if($sp)
+                    <a href="{{ route('product.show', $sp->slug) }}" class="block w-56 md:w-72 aspect-[3/4] overflow-hidden arch bg-white/10">
+                        <img src="{{ $ph($sp) }}" alt="{{ $sp->name }}" class="w-full h-full object-cover" loading="lazy">
+                    </a>
+                @endif
                 <div class="hidden md:flex flex-col gap-4">
-                    @foreach([$list->get(($k+1)%$list->count()), $list->get(($k+2)%$list->count())] as $side)
-                        <a href="{{ route('product.show', $side->slug) }}" class="block w-28 aspect-[3/4] overflow-hidden rounded-t-full bg-white/10">
-                            <img src="{{ $ph($side,300,400) }}" alt="{{ $side->name }}" class="w-full h-full object-cover" loading="lazy">
-                        </a>
+                    @foreach([$list->get(($k+1)%max($list->count(),1)), $list->get(($k+2)%max($list->count(),1))] as $side)
+                        @if($side)
+                            <a href="{{ route('product.show', $side->slug) }}" class="block w-28 aspect-[3/4] overflow-hidden rounded-t-full bg-white/10">
+                                <img src="{{ $ph($side,300,400) }}" alt="{{ $side->name }}" class="w-full h-full object-cover" loading="lazy">
+                            </a>
+                        @endif
                     @endforeach
                 </div>
             </div>
@@ -102,7 +114,7 @@
 </section>
 
 {{-- ============ MOST LOVED ============ --}}
-@if($list->count())
+@if($list->count() && $first)
 <section class="max-w-7xl mx-auto px-6 pb-24">
     <div class="grid md:grid-cols-2 gap-10">
         <a href="{{ route('product.show', $first->slug) }}" class="group block">
@@ -173,7 +185,7 @@
 </div>
 
 {{-- ============ PLUM FEATURE ============ --}}
-@if($list->count())
+@if($list->count() && $first)
 <section class="bg-plum text-white relative overflow-hidden">
     <p class="absolute -top-6 left-0 font-serif italic text-[220px] leading-none text-white/10 select-none pointer-events-none whitespace-nowrap">Lace. Fringe.</p>
     <div class="max-w-7xl mx-auto px-6 py-28 relative">
@@ -215,20 +227,26 @@
                 <p class="text-sm text-ink/70 max-w-xs mb-6 leading-relaxed">Soft lace sleeves, fringed hems, scalloped cutwork borders. The details that make a hand-finished kurta.</p>
                 <a href="{{ route('shop') }}" class="inline-block bg-ink text-white text-xs rounded-full px-6 py-3 hover:bg-plum transition">Shop the edit</a>
             </div>
+            @if($p1)
             <a href="{{ route('product.show', $p1->slug) }}" class="block">
                 <div class="aspect-[4/5] overflow-hidden rounded-t-[999px] bg-white/40"><img src="{{ $ph($p1) }}" alt="" class="w-full h-full object-cover" loading="lazy"></div>
                 <div class="flex justify-between text-xs mt-3 text-ink/70"><span>{{ $p1->name }}</span><span>Rs. {{ number_format($p1->display_price) }}</span></div>
             </a>
+            @endif
         </div>
         <div class="grid md:grid-cols-2 gap-12 mt-16">
+            @if($p2)
             <a href="{{ route('product.show', $p2->slug) }}" class="block">
                 <div class="aspect-[4/5] overflow-hidden bg-white/40"><img src="{{ $ph($p2) }}" alt="" class="w-full h-full object-cover" loading="lazy"></div>
                 <div class="flex justify-between text-xs mt-3 text-ink/70"><span>{{ $p2->name }}</span><span>Rs. {{ number_format($p2->display_price) }}</span></div>
             </a>
+            @endif
+            @if($p3)
             <a href="{{ route('product.show', $p3->slug) }}" class="block md:mt-24">
                 <div class="aspect-[4/5] overflow-hidden rounded-t-[999px] bg-white/40"><img src="{{ $ph($p3) }}" alt="" class="w-full h-full object-cover" loading="lazy"></div>
                 <div class="flex justify-between text-xs mt-3 text-ink/70"><span>{{ $p3->name }}</span><span>Rs. {{ number_format($p3->display_price) }}</span></div>
             </a>
+            @endif
         </div>
     </div>
 </section>
