@@ -33,6 +33,24 @@
                 <p class="text-2xl font-semibold mt-0.5 truncate">{{ $k === 'revenue' ? number_format($stats[$k]) : $stats[$k] }}</p>
             </div>
         </div>
+    </div>
+</div>
+
+{{-- STAT CARDS --}}
+<div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-5 mb-5 md:mb-6">
+    @foreach($cards as $k => [$label,$grad,$tint,$icon,$route])
+        <a href="{{ route($route) }}" class="rise lift relative overflow-hidden bg-white rounded-2xl soft p-4 md:p-5 block" style="--d:{{ 0.06 * ($loop->index + 1) }}s">
+            <div class="absolute -right-5 -top-5 w-20 h-20 rounded-full {{ $tint }} opacity-70"></div>
+            <div class="relative">
+                <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br {{ $grad }} text-white flex items-center justify-center shadow-md mb-3">
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="{{ $icon }}"/></svg>
+                </div>
+                <p class="text-[11px] md:text-xs text-gray-400">{{ $label }}</p>
+                <p class="text-xl md:text-2xl font-semibold mt-0.5 truncate"
+                   x-data="counter({{ (int) ($stats[$k] ?? 0) }})"
+                   x-text="v.toLocaleString()">{{ number_format($stats[$k] ?? 0) }}</p>
+            </div>
+        </a>
     @endforeach
 </div>
 

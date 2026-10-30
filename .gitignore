@@ -32,3 +32,9 @@ auth.json
 
 
 .htaccess
+
+
+public/uploads/
+public/uploads/*
+/public/uploads
+/public/uploads/

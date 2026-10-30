@@ -19,76 +19,139 @@
     $cat = fn($p) => $p->category ?? '';
 @endphp
 
-{{-- ============ HERO SLIDER ============ --}}
-@if($list->count())
-<section class="bg-royal text-white relative overflow-hidden"
-         x-data="{ i:0, n:{{ max($slideProducts->count(),1) }}, t:null,
-                   go(k){ this.i=(k+this.n)%this.n; this.reset() },
-                   reset(){ clearInterval(this.t); this.t=setInterval(()=>this.i=(this.i+1)%this.n,5500) } }"
-         x-init="reset()">
-    <div class="max-w-7xl mx-auto px-6 pt-14 pb-20 relative min-h-[560px]">
-        @foreach($slideProducts as $k => $sp)
-        <div x-show="i==={{ $k }}" x-transition.opacity.duration.500ms @if($k>0) x-cloak @endif
-             class="grid md:grid-cols-2 gap-10 items-center">
-            <div>
-                <h1 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">
-                    @if($k===0) Wear the Story,<br><span class="italic">Every Stitch</span>
-                    @elseif($k===1) Lace, lawn<br><span class="italic">&amp; embroidery</span>
-                    @else Made by hand,<br><span class="italic">worn by you</span>
+
+
+
+{{-- ============ DYNAMIC HERO SLIDER ============ --}}
+
+{{-- Inter font (Aesop-style sans-serif) — agar layout ke <head> mein pehle se nahi hai to yeh line wahan rakhein --}}
+{{-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet"> --}}
+
+@if(isset($sliders) && $sliders->count())
+<section x-data="{
+    i: 0,
+    n: {{ $sliders->count() }},
+    t: null,
+    durations: [{{ $sliders->map(fn($s) => $s->slide_duration ?? 5500)->join(',') }}],
+    go(k) { this.i = (k + this.n) % this.n; this.reset(); },
+    reset() {
+        clearInterval(this.t);
+        const d = this.durations[this.i] || 5500;
+        this.t = setInterval(() => this.i = (this.i + 1) % this.n, d);
+    }
+}" x-init="reset()" class="relative overflow-hidden min-h-[560px] md:min-h-[640px]">
+
+    @foreach($sliders as $k => $slide)
+        <div x-show="i === {{ $k }}"
+             x-transition.opacity.duration.700ms
+             @if($k > 0) x-cloak @endif
+             class="absolute inset-0 w-full h-full"
+             style="{{ $slide->background_style }}">
+
+            @if($slide->content_type === 'image_only')
+                {{-- IMAGE ONLY MODE --}}
+                <a href="{{ $slide->button_url ?: '#' }}" class="block w-full h-full relative">
+                    @if($slide->image_url)
+                        <img src="{{ $slide->image_url }}" alt="{{ $slide->title ?? 'Banner' }}"
+                             class="absolute inset-0 w-full h-full object-cover"
+                             loading="{{ $k === 0 ? 'eager' : 'lazy' }}">
                     @endif
-                </h1>
-                <p class="text-sm md:text-base text-white/75 max-w-sm leading-relaxed mb-8">
-                    Stitched and unstitched ladies' clothing from Karachi. Embroidery, lace and lawn in colours that move with you.
-                </p>
-                <div class="flex flex-wrap gap-3">
-                    <a href="{{ route('shop') }}" class="bg-white text-royal text-xs font-medium rounded-full px-6 py-3 hover:bg-blush transition">Shop collection</a>
-                    @if($sp)
-                        <a href="{{ route('product.show', $sp->slug) }}" class="border border-white/50 text-xs rounded-full px-6 py-3 hover:bg-white/10 transition">View look</a>
-                    @endif
-                </div>
-            </div>
-            <div class="relative flex justify-center md:justify-end items-end gap-4">
-                @if($sp)
-                    <a href="{{ route('product.show', $sp->slug) }}" class="block w-56 md:w-72 aspect-[3/4] overflow-hidden arch bg-white/10">
-                        <img src="{{ $ph($sp) }}" alt="{{ $sp->name }}" class="w-full h-full object-cover" loading="lazy">
-                    </a>
-                @endif
-                <div class="hidden md:flex flex-col gap-4">
-                    @foreach([$list->get(($k+1)%max($list->count(),1)), $list->get(($k+2)%max($list->count(),1))] as $side)
-                        @if($side)
-                            <a href="{{ route('product.show', $side->slug) }}" class="block w-28 aspect-[3/4] overflow-hidden rounded-t-full bg-white/10">
-                                <img src="{{ $ph($side,300,400) }}" alt="{{ $side->name }}" class="w-full h-full object-cover" loading="lazy">
+                </a>
+            @else
+                {{-- CUSTOM MODE --}}
+                <div class="max-w-7xl mx-auto px-6 pt-14 pb-20 h-full grid md:grid-cols-2 gap-10 items-center
+                            {{ $slide->image_position === 'left' ? 'md:[&>*:first-child]:order-2' : '' }}">
+
+                    <div style="color: {{ $slide->text_color ?? '#1A1A1A' }}; text-align: {{ $slide->text_alignment ?? 'left' }}">
+                        @if($slide->subtitle)
+                            <p class="text-xs uppercase tracking-[0.2em] opacity-70 mb-4">{{ $slide->subtitle }}</p>
+                        @endif
+                        @if($slide->title)
+                            <h1 class="text-5xl md:text-7xl leading-[1.02] font-normal mb-6"
+                                style="font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;">
+                                {!! nl2br(e($slide->title)) !!}
+                            </h1>
+                        @endif
+                        @if($slide->description)
+                            <p class="text-sm md:text-base opacity-80 max-w-sm leading-relaxed mb-8">{{ $slide->description }}</p>
+                        @endif
+                        <div class="flex flex-wrap gap-3 {{ ($slide->text_alignment ?? 'left') === 'center' ? 'justify-center' : '' }}">
+                            @if($slide->button_text)
+                                <a href="{{ $slide->button_url ?: '#' }}"
+                                   class="inline-block bg-black text-white text-xs font-medium rounded-full px-6 py-3 hover:opacity-80 transition">
+                                    {{ $slide->button_text }}
+                                </a>
+                            @endif
+                            @if($slide->secondary_button_text)
+                                <a href="{{ $slide->secondary_button_url ?: '#' }}"
+                                   class="inline-block border border-current text-xs rounded-full px-6 py-3 hover:opacity-70 transition">
+                                    {{ $slide->secondary_button_text }}
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="relative flex justify-center md:justify-end items-end gap-4 h-full">
+                        @if($slide->image_url)
+                            <a href="{{ $slide->button_url ?: '#' }}"
+                               class="block w-56 md:w-72 aspect-[3/4] overflow-hidden rounded-t-full shadow-lg self-end">
+                                <img src="{{ $slide->image_url }}" alt="{{ $slide->title }}"
+                                     class="w-full h-full object-cover" loading="{{ $k === 0 ? 'eager' : 'lazy' }}">
                             </a>
                         @endif
-                    @endforeach
+                        @if($slide->secondary_image_url)
+                            <div class="hidden md:block w-28 aspect-[3/4] overflow-hidden rounded-t-full shadow self-end">
+                                <img src="{{ $slide->secondary_image_url }}" alt=""
+                                     class="w-full h-full object-cover" loading="lazy">
+                            </div>
+                        @endif
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
-        @endforeach
+    @endforeach
 
-        {{-- dots --}}
-        <div class="absolute right-6 bottom-6 flex items-center gap-2">
-            <button @click="go(i-1)" class="w-8 h-8 rounded-full border border-white/40 hover:bg-white/10" aria-label="Previous">‹</button>
-            @foreach($slideProducts as $k => $_)
-                <button @click="go({{ $k }})" :class="i==={{ $k }} ? 'w-6 bg-white' : 'w-2 bg-white/40'" class="h-2 rounded-full transition-all" aria-label="Slide {{ $k+1 }}"></button>
+    {{-- Navigation --}}
+    @if($sliders->count() > 1)
+        <div class="absolute right-6 bottom-6 flex items-center gap-2 z-10">
+            <button @click="go(i-1)" class="w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow flex items-center justify-center" aria-label="Previous">‹</button>
+            @foreach($sliders as $k => $_)
+                <button @click="go({{ $k }})"
+                        :class="i === {{ $k }} ? 'w-6 bg-black' : 'w-2 bg-black/30'"
+                        class="h-2 rounded-full transition-all" aria-label="Slide {{ $k+1 }}"></button>
             @endforeach
-            <button @click="go(i+1)" class="w-8 h-8 rounded-full border border-white/40 hover:bg-white/10" aria-label="Next">›</button>
+            <button @click="go(i+1)" class="w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow flex items-center justify-center" aria-label="Next">›</button>
         </div>
-    </div>
-
-    {{-- small marquee --}}
-    <div class="border-t border-white/15 py-3 overflow-hidden">
-        <div class="marquee text-[11px] uppercase tracking-[0.2em] text-white/70 whitespace-nowrap">
-            @for($m=0;$m<4;$m++)
-                <span class="mx-6">Free shipping over Rs. 10,000</span><span>·</span>
-                <span class="mx-6">Cash on delivery &amp; bank transfer</span><span>·</span>
-                <span class="mx-6">Stitched &amp; unstitched</span><span>·</span>
-                <span class="mx-6">Karachi, Pakistan</span><span>·</span>
-            @endfor
-        </div>
-    </div>
+    @endif
 </section>
+@else
+    {{-- Fallback hero (no sliders) --}}
+    <section class="max-w-7xl mx-auto px-6 pt-16 pb-10">
+        <p class="text-xs uppercase tracking-widest text-muted mb-6">Stitched · Unstitched · Karachi</p>
+        <h1 class="text-5xl md:text-7xl leading-[1.05] font-normal mb-8 max-w-5xl"
+            style="font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;">
+            Wear the Story,<br>
+            <span class="italic opacity-70">Live the Craft.</span>
+        </h1>
+        <p class="text-sm md:text-base text-muted max-w-xl leading-relaxed mb-10">
+            Discover our latest collection of hand-crafted ensembles — thoughtfully designed
+            for the modern wardrobe. From everyday essentials to statement pieces,
+            each garment tells a story of heritage and craftsmanship.
+        </p>
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ url('/shop') }}"
+               class="inline-block bg-black text-white text-xs font-medium rounded-full px-6 py-3 hover:opacity-80 transition">
+                Shop Collection
+            </a>
+            <a href="{{ url('/about') }}"
+               class="inline-block border border-current text-xs rounded-full px-6 py-3 hover:opacity-70 transition">
+                Our Story
+            </a>
+        </div>
+    </section>
 @endif
+
+
 
 {{-- ============ COLLECTIONS ============ --}}
 <section class="max-w-7xl mx-auto px-6 py-24">

@@ -6,11 +6,11 @@ use App\Models\Product;
 
 class ShopController extends Controller
 {
-    public function home()
-    {
-        $products = Product::where('is_active', true)->latest()->take(8)->get();
-        return view('shop.home', compact('products'));
-    }
+    // public function home()
+    // {
+    //     $products = Product::where('is_active', true)->latest()->take(8)->get();
+    //     return view('shop.home', compact('products'));
+    // }
 
     public function index()
     {
@@ -24,4 +24,13 @@ class ShopController extends Controller
         $related = Product::where('is_active', true)->where('id', '!=', $product->id)->take(4)->get();
         return view('shop.show', compact('product', 'related'));
     }
+
+
+    public function home()
+    {
+        $sliders = \App\Models\HomeSlider::active()->get();
+        $products = Product::where('is_active', true)->latest()->take(8)->get();
+        return view('shop.home', compact('products', 'sliders'));
+    }
+
 }
