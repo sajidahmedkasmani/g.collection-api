@@ -114,111 +114,147 @@ class ProductController extends Controller
     return $data;
 }
 
-public function importForm()
-{
-    return view('admin.products.import');
-}
-
-public function import(Request $request)
-{
-    $request->validate([
-        'csv_file' => 'required|file|mimes:csv,txt|max:20480',
-    ]);
-
-    $handle = fopen($request->file('csv_file')->getRealPath(), 'r');
-
-    // BOM hatao
-    $bom = fread($handle, 3);
-    if ($bom !== "\xEF\xBB\xBF") rewind($handle);
-
-    $header = fgetcsv($handle, 0, ',', '"', '\\');
-    if (!$header) {
-        fclose($handle);
-        return back()->with('error', 'CSV khaali hai ya header row nahi mili.');
+    public function importForm()
+    {
+        return view('admin.products.import');
     }
 
-    $header = array_map(fn($h) => strtolower(trim($h)), $header);
+    public function import(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:20480',
+        ]);
 
-    // Zaroori columns check karo
-    $required = ['name', 'price'];
-    $missing = array_diff($required, $header);
-    if (!empty($missing)) {
-        fclose($handle);
-        return back()->with('error', 'CSV mein yeh columns missing hain: ' . implode(', ', $missing) . '. Expected columns: name, price, description, image, stock, category, is_active');
-    }
+        $handle = fopen($request->file('csv_file')->getRealPath(), 'r');
 
-    $imported = 0;
-    $updated = 0;
-    $skipped = 0;
-    $errors = [];
+        // BOM hatao
+        $bom = fread($handle, 3);
+        if ($bom !== "\xEF\xBB\xBF") rewind($handle);
 
-    while (($row = fgetcsv($handle, 0, ',', '"', '\\')) !== false) {
-        // Row ko header ke size ke barabar karo
-        $row = array_slice($row, 0, count($header));
-        $row = array_pad($row, count($header), '');
-        $data = array_combine($header, $row);
-
-        $name = trim($data['name'] ?? '');
-        if ($name === '') { $skipped++; continue; }
-
-        $price = (float) preg_replace('/[^0-9.]/', '', $data['price'] ?? '0');
-        $description = trim($data['description'] ?? '');
-        $image = trim($data['image'] ?? '');
-        $stock = trim($data['stock'] ?? '');
-        $category = strtolower(trim($data['category'] ?? 'other')) ?: 'other';
-        $isActive = isset($data['is_active']) ? (bool)(int)$data['is_active'] : true;
-
-        // Category validate
-        if (!in_array($category, ['stitched', 'unstitched', 'accessories', 'other'])) {
-            $category = 'other';
+        $header = fgetcsv($handle, 0, ',', '"', '\\');
+        if (!$header) {
+            fclose($handle);
+            return back()->with('error', 'CSV khaali hai ya header row nahi mili.');
         }
 
-        // Slug unique
-        $slug = Str::slug($name);
-        $baseSlug = $slug;
-        $i = 1;
-        while (Product::where('slug', $slug)->where('name', '!=', $name)->exists()) {
-            $slug = $baseSlug . '-' . $i++;
+        $header = array_map(fn($h) => strtolower(trim($h)), $header);
+
+        // Zaroori columns check karo
+        $required = ['name', 'price'];
+        $missing = array_diff($required, $header);
+        if (!empty($missing)) {
+            fclose($handle);
+            return back()->with('error', 'CSV mein yeh columns missing hain: ' . implode(', ', $missing) . '. Expected columns: name, price, description, image, stock, category, is_active');
         }
 
-        try {
-            $existing = Product::where('name', $name)->first();
+        $imported = 0;
+        $updated = 0;
+        $skipped = 0;
+        $errors = [];
 
-            $payload = [
-                'name'        => $name,
-                'slug'        => $existing ? $existing->slug : $slug,
-                'price'       => $price,
-                'price_paisa' => (int) round($price * 100),
-                'description' => $description,
-                'image'       => $image ?: null,
-                'image_url'   => $image ?: null,
-                'stock'       => $stock !== '' ? (int) $stock : null,
-                'category'    => $category,
-                'is_active'   => $isActive,
-            ];
+        while (($row = fgetcsv($handle, 0, ',', '"', '\\')) !== false) {
+            // Row ko header ke size ke barabar karo
+            $row = array_slice($row, 0, count($header));
+            $row = array_pad($row, count($header), '');
+            $data = array_combine($header, $row);
 
-            if ($existing) {
-                $existing->update($payload);
-                $updated++;
-            } else {
-                Product::create($payload);
-                $imported++;
+            $name = trim($data['name'] ?? '');
+            if ($name === '') { $skipped++; continue; }
+
+            $price = (float) preg_replace('/[^0-9.]/', '', $data['price'] ?? '0');
+            $description = trim($data['description'] ?? '');
+            $image = trim($data['image'] ?? '');
+            $stock = trim($data['stock'] ?? '');
+            $category = strtolower(trim($data['category'] ?? 'other')) ?: 'other';
+            $isActive = isset($data['is_active']) ? (bool)(int)$data['is_active'] : true;
+
+            // Category validate
+            if (!in_array($category, ['stitched', 'unstitched', 'accessories', 'other'])) {
+                $category = 'other';
             }
-        } catch (\Throwable $e) {
-            $errors[] = $name . ': ' . $e->getMessage();
-            $skipped++;
+
+            // Slug unique
+            $slug = Str::slug($name);
+            $baseSlug = $slug;
+            $i = 1;
+            while (Product::where('slug', $slug)->where('name', '!=', $name)->exists()) {
+                $slug = $baseSlug . '-' . $i++;
+            }
+
+            try {
+                $existing = Product::where('name', $name)->first();
+
+                $payload = [
+                    'name'        => $name,
+                    'slug'        => $existing ? $existing->slug : $slug,
+                    'price'       => $price,
+                    'price_paisa' => (int) round($price * 100),
+                    'description' => $description,
+                    'image'       => $image ?: null,
+                    'image_url'   => $image ?: null,
+                    'stock'       => $stock !== '' ? (int) $stock : null,
+                    'category'    => $category,
+                    'is_active'   => $isActive,
+                ];
+
+                if ($existing) {
+                    $existing->update($payload);
+                    $updated++;
+                } else {
+                    Product::create($payload);
+                    $imported++;
+                }
+            } catch (\Throwable $e) {
+                $errors[] = $name . ': ' . $e->getMessage();
+                $skipped++;
+            }
         }
+
+        fclose($handle);
+
+        $msg = "Import done! Naye: {$imported}, Update: {$updated}, Skip: {$skipped}.";
+        if (count($errors)) {
+            $msg .= ' Errors: ' . implode(' | ', array_slice($errors, 0, 3));
+        }
+
+        return redirect()->route('admin.products.index')->with('success', $msg);
     }
 
-    fclose($handle);
+    
 
-    $msg = "Import done! Naye: {$imported}, Update: {$updated}, Skip: {$skipped}.";
-    if (count($errors)) {
-        $msg .= ' Errors: ' . implode(' | ', array_slice($errors, 0, 3));
+    /**
+    * Bulk delete selected products.
+    */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids'   => ['required', 'array'],
+            'ids.*' => ['integer', 'exists:products,id'],
+        ]);
+
+        $count = Product::whereIn('id', $request->ids)->delete();
+
+        return back()->with('success', "{$count} product(s) deleted successfully.");
     }
 
-    return redirect()->route('admin.products.index')->with('success', $msg);
-}
+    /**
+    * Bulk update status (active/inactive) for selected products.
+    */
+    public function bulkStatus(Request $request)
+    {
+        $request->validate([
+            'ids'    => ['required', 'array'],
+            'ids.*'  => ['integer', 'exists:products,id'],
+            'status' => ['required', 'boolean'],
+        ]);
+
+        $count = Product::whereIn('id', $request->ids)
+            ->update(['is_active' => (bool) $request->status]);
+
+        $label = $request->status ? 'activated' : 'deactivated';
+
+        return back()->with('success', "{$count} product(s) {$label} successfully.");
+    }
 
 
 
