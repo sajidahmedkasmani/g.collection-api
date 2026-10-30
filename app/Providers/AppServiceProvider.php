@@ -4,14 +4,18 @@ namespace App\Providers;
 
 use App\Models\Permission;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        // Har permission ke liye Gate define karein
-        // (config/cache se list lo taake har request DB hit na ho)
+        // Table exist karti hai tabhi permissions load karein
+        if (!Schema::hasTable('permissions')) {
+            return;
+        }
+
         $permissionNames = cache()->rememberForever('permission_names', function () {
             return Permission::pluck('name')->toArray();
         });
