@@ -6,6 +6,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\SettingController;
 
@@ -51,7 +52,18 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Bulk actions
     Route::post('/products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
     Route::post('/products/bulk-status', [ProductController::class, 'bulkStatus'])->name('products.bulk-status');
+  
     
+    Route::get('/users', [UserController::class, 'index'])->name('users.index')->middleware('can:users.view');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create')->middleware('can:users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store')->middleware('can:users.create');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit')->middleware('can:users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('can:users.edit');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy')->middleware('can:users.delete');
+    Route::post('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])
+        ->name('users.toggle-active')->middleware('can:users.toggle-active');
+
+
 });
 
 require __DIR__.'/auth.php';
