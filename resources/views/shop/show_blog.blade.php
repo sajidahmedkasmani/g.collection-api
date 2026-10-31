@@ -11,7 +11,7 @@
 {{-- ============ HERO ============ --}}
 <section class="bg-blush">
     <div class="max-w-4xl mx-auto px-6 pt-14 md:pt-20 pb-16 text-center">
-        <a href="{{ route('blog.index') }}" class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-plum hover:gap-3 transition-all mb-8">← The Journal</a>
+        <a href="{{ route('blogs') }}" class="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] text-plum hover:gap-3 transition-all mb-8">← The Journal</a>
         <div class="flex items-center justify-center gap-3 text-[11px] uppercase tracking-[0.2em] text-ink/60 mb-6">
             <span class="bg-plum text-white rounded-full px-3 py-1">{{ $post->category }}</span>
             <span>{{ $post->dt->format('d M Y') }}</span>
