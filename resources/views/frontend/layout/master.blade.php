@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
 
     <script>
         tailwind.config = {
@@ -103,15 +103,16 @@
             </nav>
 
             <div class="flex items-center gap-4 sm:gap-5">
-                <a href="{{ route('shop') }}" aria-label="Search" class="hidden md:block hover:text-rose transition">
+                <a href="{{ route('shop') }}" aria-label="Search" class="hover:text-rose transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
                 </a>
                 <a href="#" aria-label="Wishlist" class="hidden md:block hover:text-rose transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.3 5.3 0 0 1 12 6a5.3 5.3 0 0 1 9.3 6C19 16.4 12 21 12 21Z"/></svg>
                 </a>
 
-                {{-- Cart: opens the drawer (goes to the page on cart/checkout pages) --}}
-                <a href="{{ route('cart.index') }}" aria-label="Cart, {{ $gcCount }} items" class="relative hover:text-rose transition"
+                {{-- Cart (on mobile it lives in the bottom bar, except on cart/checkout pages where the bar is hidden) --}}
+                <a href="{{ route('cart.index') }}" aria-label="Cart, {{ $gcCount }} items"
+                   class="relative hover:text-rose transition {{ $gcSkipDrawer ? '' : 'hidden md:block' }}"
                    @unless($gcSkipDrawer) @click.prevent="cart = true; menu = false" @endunless>
                     <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
                     @if($gcCount > 0)
@@ -121,8 +122,7 @@
 
                 {{-- Account --}}
                 @if($customer)
-                    {{-- Mobile: straight to dashboard --}}
-                    <a href="{{ route('customer.dashboard') }}" aria-label="My account" class="md:hidden hover:text-rose transition">{!! $userSvg !!}</a>
+                    <a href="{{ route('customer.dashboard') }}" aria-label="My account" class="{{ $gcSkipDrawer ? 'md:hidden' : 'hidden' }} hover:text-rose transition">{!! $userSvg !!}</a>
 
                     {{-- Desktop: hover card --}}
                     <div class="relative hidden md:block"
@@ -168,75 +168,120 @@
                         </div>
                     </div>
                 @else
-                    <a href="{{ route('customer.login') }}" aria-label="Log in" title="Log in" class="hover:text-rose transition">{!! $userSvg !!}</a>
+                    <a href="{{ route('customer.login') }}" aria-label="Log in" title="Log in"
+                       class="hover:text-rose transition {{ $gcSkipDrawer ? '' : 'hidden md:block' }}">{!! $userSvg !!}</a>
                 @endif
-
-                <button class="md:hidden -mr-1 p-1" @click="menu = true; cart = false" aria-label="Open menu" :aria-expanded="menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
-                </button>
             </div>
         </div>
     </header>
 
-    <!-- MOBILE MENU (full screen, same links as desktop) -->
-    <div x-cloak x-show="menu"
-         x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0"
-         x-transition:leave="transition duration-200 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-         class="md:hidden fixed inset-0 z-[60] bg-cream overflow-y-auto" role="dialog" aria-modal="true" aria-label="Menu">
-        <div class="min-h-full flex flex-col px-5 pb-8">
-            <div class="flex items-center justify-between py-3.5">
-                <a href="{{ route('home') }}" class="font-serif text-2xl tracking-tight">G. Collection</a>
-                <button @click="menu = false" aria-label="Close menu" class="p-1 -mr-1">
+    @unless($gcSkipDrawer)
+    <!-- MOBILE BOTTOM BAR -->
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-[55] bg-cream/95 backdrop-blur border-t border-black/10"
+         style="padding-bottom: env(safe-area-inset-bottom)" aria-label="Quick navigation">
+        <ul class="grid grid-cols-5 text-[11px]">
+            <li>
+                <a href="{{ route('home') }}" class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('home') ? 'text-plum font-medium' : 'text-ink/60' }}">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></svg>
+                    Home
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('shop') }}" class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('shop') ? 'text-plum font-medium' : 'text-ink/60' }}">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>
+                    Shop
+                </a>
+            </li>
+            <li>
+                <button type="button" @click="cart = true; menu = false" class="w-full flex flex-col items-center gap-1 py-2.5 text-ink/60" aria-label="Open cart, {{ $gcCount }} items">
+                    <span class="relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+                        @if($gcCount > 0)
+                            <span class="absolute -top-1.5 -right-2.5 bg-rose text-white text-[10px] font-medium rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{{ $gcCount }}</span>
+                        @endif
+                    </span>
+                    Cart
+                </button>
+            </li>
+            <li>
+                <a href="{{ $customer ? route('customer.dashboard') : route('customer.login') }}"
+                   class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('customer.*') ? 'text-plum font-medium' : 'text-ink/60' }}">
+                    {!! str_replace('w-[22px] h-[22px]', 'w-6 h-6', $userSvg) !!}
+                    {{ $customer ? 'Account' : 'Log in' }}
+                </a>
+            </li>
+            <li>
+                <button type="button" @click="menu = true; cart = false" class="w-full flex flex-col items-center gap-1 py-2.5 text-ink/60" aria-haspopup="dialog" :aria-expanded="menu">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+                    Menu
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- MOBILE MENU SHEET (slides up from the bottom, same links as desktop) -->
+    <div class="md:hidden fixed inset-0 z-[60]" :class="menu ? '' : 'pointer-events-none'">
+        <div x-cloak x-show="menu" x-transition.opacity.duration.250ms class="absolute inset-0 bg-ink/40 backdrop-blur-sm" @click="menu = false"></div>
+
+        <div x-cloak x-show="menu"
+             x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+             x-transition:leave="transition duration-200 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
+             class="absolute inset-x-0 bottom-0 max-h-[88%] overflow-y-auto bg-cream rounded-t-3xl shadow-[0_-20px_50px_-20px_rgba(31,18,21,.35)] px-5 pt-3"
+             style="padding-bottom: max(1.5rem, env(safe-area-inset-bottom))"
+             role="dialog" aria-modal="true" aria-label="Menu">
+
+            <div class="mx-auto w-10 h-1 rounded-full bg-black/15 mb-3"></div>
+            <div class="flex items-center justify-between mb-1">
+                <p class="font-serif text-2xl">Menu</p>
+                <button type="button" @click="menu = false" aria-label="Close menu" class="p-1 -mr-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
                 </button>
             </div>
 
-            <nav class="mt-4" aria-label="Mobile">
+            <nav aria-label="Mobile">
                 @foreach($gcNav as [$label, $name])
-                    <a href="{{ route($name) }}" class="flex items-center justify-between py-4 border-b border-black/10 font-serif text-3xl {{ request()->routeIs($name) ? 'text-rose' : '' }}">
+                    <a href="{{ route($name) }}" class="flex items-center justify-between py-3.5 border-b border-black/10 text-lg {{ request()->routeIs($name) ? 'text-rose font-medium' : '' }}">
                         {{ $label }}
                         <svg class="w-5 h-5 text-black/30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
                     </a>
-                    @if($name === 'shop')
-                        <div class="flex flex-wrap gap-2 py-4 border-b border-black/10">
-                            @foreach($gcCats as $slug => $catLabel)
-                                <a href="{{ route('shop') }}?category={{ $slug }}" class="px-4 py-2 rounded-full border border-black/15 text-sm hover:border-plum hover:text-plum transition">{{ $catLabel }}</a>
-                            @endforeach
-                        </div>
-                    @endif
                 @endforeach
             </nav>
 
-            <div class="mt-8">
-                @if($customer)
-                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-blush/50">
-                        <div class="w-11 h-14 arch bg-plum text-cream font-serif text-lg flex items-end justify-center pb-1 shrink-0">{{ mb_strtoupper(mb_substr($customer->name, 0, 1)) }}</div>
-                        <div class="min-w-0">
-                            <p class="font-serif text-lg leading-tight truncate">{{ $customer->name }}</p>
-                            <p class="text-xs text-muted truncate">{{ $customer->email }}</p>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3 mt-3 text-sm">
-                        <a href="{{ route('customer.dashboard') }}" class="text-center py-3 rounded-xl border border-black/15">My account</a>
-                        <form method="POST" action="{{ route('customer.logout') }}">
-                            @csrf
-                            <button class="w-full py-3 rounded-xl border border-black/15 text-muted">Log out</button>
-                        </form>
-                    </div>
-                @else
-                    <div class="grid grid-cols-2 gap-3 text-sm">
-                        <a href="{{ route('customer.login') }}" class="text-center py-3.5 rounded-xl bg-plum text-cream font-medium">Log in</a>
-                        <a href="{{ route('customer.register') }}" class="text-center py-3.5 rounded-xl border border-black/15">Create account</a>
-                    </div>
-                @endif
+            <div class="flex flex-wrap gap-2 py-4">
+                @foreach($gcCats as $slug => $catLabel)
+                    <a href="{{ route('shop') }}?category={{ $slug }}" class="px-4 py-2 rounded-full border border-black/15 text-sm hover:border-plum hover:text-plum transition">{{ $catLabel }}</a>
+                @endforeach
             </div>
 
-            <div class="mt-auto pt-10 text-sm text-muted space-y-1">
-                <a href="https://wa.me/923347779231" class="block text-ink font-medium">WhatsApp +92 334 7779231</a>
+            @if($customer)
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-blush/50">
+                    <div class="w-11 h-14 arch bg-plum text-cream font-serif text-lg flex items-end justify-center pb-1 shrink-0">{{ mb_strtoupper(mb_substr($customer->name, 0, 1)) }}</div>
+                    <div class="min-w-0">
+                        <p class="font-serif text-lg leading-tight truncate">{{ $customer->name }}</p>
+                        <p class="text-xs text-muted truncate">{{ $customer->email }}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3 text-sm">
+                    <a href="{{ route('customer.dashboard') }}" class="text-center py-3 rounded-xl border border-black/15">My account</a>
+                    <form method="POST" action="{{ route('customer.logout') }}">
+                        @csrf
+                        <button class="w-full py-3 rounded-xl border border-black/15 text-muted">Log out</button>
+                    </form>
+                </div>
+            @else
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <a href="{{ route('customer.login') }}" class="text-center py-3.5 rounded-xl bg-plum text-cream font-medium">Log in</a>
+                    <a href="{{ route('customer.register') }}" class="text-center py-3.5 rounded-xl border border-black/15">Create account</a>
+                </div>
+            @endif
+
+            <div class="pt-5 text-sm text-muted">
+                <a href="https://wa.me/923347779231" class="text-ink font-medium">WhatsApp +92 334 7779231</a>
                 <p>Mon–Sat, 11:00 AM – 9:00 PM</p>
             </div>
         </div>
     </div>
+    @endunless
 
     <!-- CART DRAWER -->
     <div class="fixed inset-0 z-[70]" :class="cart ? '' : 'pointer-events-none'">
@@ -327,7 +372,7 @@
     <main>@yield('content')</main>
 
     <!-- FOOTER -->
-    <footer class="bg-ink text-cream">
+    <footer class="bg-ink text-cream {{ $gcSkipDrawer ? '' : 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' }}">
         <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
             <div class="col-span-2 md:col-span-1">
                 <p class="font-serif text-3xl mb-3">G. Collection</p>
