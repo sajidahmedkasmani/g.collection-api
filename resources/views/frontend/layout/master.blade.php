@@ -44,7 +44,10 @@
 
     <style>
         [x-cloak]{display:none!important}
-        body{background:#FAF7F2;color:#1F1215}
+        /* Anything wider than the screen (sliders, marquees) must never widen the page:
+           otherwise Chrome zooms out and fixed bars/menus stretch past the content. */
+        html{overflow-x:hidden;max-width:100%}
+        body{background:#FAF7F2;color:#1F1215;overflow-x:clip;max-width:100%;position:relative}
         .marquee{display:flex;width:max-content;animation:marquee 40s linear infinite}
         .marquee-slow{animation-duration:60s}
         @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
@@ -94,7 +97,7 @@
     <!-- HEADER -->
     <header class="bg-cream/95 backdrop-blur border-b border-black/10 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="font-serif text-2xl tracking-tight">Sub G. Collection</a>
+            <a href="{{ route('home') }}" class="font-serif text-2xl tracking-tight">G. Collection</a>
 
             <nav class="hidden md:flex items-center gap-9 text-sm" aria-label="Main">
                 @foreach($gcNav as [$label, $name])
