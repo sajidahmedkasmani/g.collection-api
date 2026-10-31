@@ -12,17 +12,36 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        // $query = Product::query();
+
+        // if ($request->filled('search')) {
+        //     $query->where('name', 'like', '%' . $request->search . '%');
+        // }
+        // if ($request->filled('status')) {
+        //     $query->where('is_active', $request->status === 'active');
+        // }
+
+        // $products = $query->latest()->paginate(15)->withQueryString();
+
         $query = Product::query();
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+        if ($request->filled('category')) {
+            $query->whereHas('category', fn($q) => $q->where('slug', $request->category));
+            // agar category sirf ek column hai: $query->where('category', $request->category);
         }
-        if ($request->filled('status')) {
-            $query->where('is_active', $request->status === 'active');
+        if ($request->filled('q')) {
+            $query->where('name', 'like', '%' . $request->q . '%');
         }
+        match ($request->get('sort', 'newest')) {
+            'price_asc'  => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
+            default      => $query->latest(),
+        };
 
-        $products = $query->latest()->paginate(15)->withQueryString();
+        $products = $query->paginate(12)->withQueryString();
+
         return view('admin.products.index', compact('products'));
+        
     }
 
     public function create()
