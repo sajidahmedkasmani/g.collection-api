@@ -17,6 +17,12 @@ Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.sh
 
 Route::get('/about-us', [ShopController::class, 'about'])->name('aboutus');
 Route::get('/blogs', [ShopController::class, 'blogs'])->name('blogs');
+Route::get('/contact', [ShopController::class, 'contact'])->name('contact');
+
+// use App\Http\Controllers\ContactController;
+
+// Route::get('/contact', [ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [ShopController::class, 'send'])->middleware('throttle:5,1')->name('contact.send');
 
 // ===== CART =====
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
