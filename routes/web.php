@@ -19,11 +19,10 @@ Route::get('/about-us', [ShopController::class, 'about'])->name('aboutus');
 Route::get('/blogs', [ShopController::class, 'blogs'])->name('blogs');
 Route::get('/contact', [ShopController::class, 'contact'])->name('contact');
 
-use App\Http\Controllers\BlogController;
 
 // Route::view('/about', 'about')->name('about');
 // Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blogs/{slug}', [BlogController::class, 'show_blog'])->name('blog.show');
+Route::get('/blogs/{slug}', [ShopController::class, 'show_blog'])->name('blog.show');
 
 // use App\Http\Controllers\ContactController;
 
