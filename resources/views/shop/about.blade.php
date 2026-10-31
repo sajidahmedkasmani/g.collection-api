@@ -138,7 +138,7 @@
     <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-8">Find the piece that<br><span class="italic text-plum">feels like you.</span></h2>
     <div class="flex flex-wrap justify-center gap-3">
         <a href="{{ route('shop') }}" class="bg-plum text-white text-xs rounded-full px-8 py-4 hover:bg-ink transition">Shop now</a>
-        <a href="{{ route('blog.index') }}" class="border border-ink/30 text-xs rounded-full px-8 py-4 hover:bg-white transition">Read the journal</a>
+        <a href="{{ route('blogs') }}" class="border border-ink/30 text-xs rounded-full px-8 py-4 hover:bg-white transition">Read the journal</a>
     </div>
 </section>
 @endsection
