@@ -67,8 +67,13 @@
                             <p class="text-xs uppercase tracking-[0.2em] opacity-70 mb-4">{{ $slide->subtitle }}</p>
                         @endif
                         @if($slide->title)
-                            <h1 class="text-5xl md:text-7xl leading-[1.02] font-normal mb-6"
-                                style="font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;">
+                            <!-- <h1 class="text-5xl md:text-7xl leading-[1.02] font-normal mb-6"
+                                style="font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;"
+                                > -->
+                            <h1 
+                                
+                                class="font-serif italic text-5xl md:text-7xl leading-[1.02] mb-6"
+                                >
                                 {!! nl2br(e($slide->title)) !!}
                             </h1>
                         @endif
