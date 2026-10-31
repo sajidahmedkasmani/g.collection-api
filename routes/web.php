@@ -15,6 +15,9 @@ Route::get('/', [ShopController::class, 'home'])->name('home');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.show');
 
+Route::get('/about-us', [ShopController::class, 'about'])->name('aboutus');
+Route::get('/blogs', [ShopController::class, 'blogs'])->name('blogs');
+
 // ===== CART =====
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');

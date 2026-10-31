@@ -33,4 +33,13 @@ class ShopController extends Controller
         return view('shop.home', compact('products', 'sliders'));
     }
 
+    public function about()
+    {
+        return view('shop.about');
+    }
+    public function blogs()
+    {
+        return view('shop.blogs');
+    }
+
 }
