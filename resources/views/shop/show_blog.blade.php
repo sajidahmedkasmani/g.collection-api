@@ -78,7 +78,7 @@
     <div class="max-w-7xl mx-auto px-6 py-20">
         <div class="flex items-end justify-between mb-10">
             <h2 class="font-serif text-4xl md:text-5xl">Keep <span class="italic text-rose">reading.</span></h2>
-            <a href="{{ route('blog.index') }}" class="text-xs uppercase tracking-[0.2em] border-b border-cream/40 pb-1 hover:text-rose hover:border-rose transition">All stories</a>
+            <a href="{{ route('blogs') }}" class="text-xs uppercase tracking-[0.2em] border-b border-cream/40 pb-1 hover:text-rose hover:border-rose transition">All stories</a>
         </div>
         <div class="grid md:grid-cols-3 gap-6">
             @foreach($related as $p)
