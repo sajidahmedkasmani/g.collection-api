@@ -94,7 +94,7 @@
     <!-- HEADER -->
     <header class="bg-cream/95 backdrop-blur border-b border-black/10 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="font-serif text-2xl tracking-tight">G. Collection</a>
+            <a href="{{ route('home') }}" class="font-serif text-2xl tracking-tight">Sub G. Collection</a>
 
             <nav class="hidden md:flex items-center gap-9 text-sm" aria-label="Main">
                 @foreach($gcNav as [$label, $name])
