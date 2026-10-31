@@ -9,25 +9,27 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SliderController;
+
+use App\Http\Controllers\CustomerAuthController;
+use App\Http\Controllers\CustomerRegisterController;
 
 // ===== PUBLIC =====
-Route::get('/', [ShopController::class, 'home'])->name('home');
-Route::get('/shop', [ShopController::class, 'index'])->name('shop');
-Route::get('/product/{slug}', [ShopController::class, 'show'])->name('product.show');
+Route::controller(ShopController::class)->group(function() {
+    Route::get('/', 'home')->name('home');
 
-Route::get('/about-us', [ShopController::class, 'about'])->name('aboutus');
-Route::get('/blogs', [ShopController::class, 'blogs'])->name('blogs');
-Route::get('/contact', [ShopController::class, 'contact'])->name('contact');
+    Route::get('/about-us', 'about')->name('aboutus');
 
+    Route::get('/shop', 'index')->name('shop');
+    Route::get('/product/{slug}', 'show')->name('product.show');
 
-// Route::view('/about', 'about')->name('about');
-// Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
-Route::get('/blogs/{slug}', [ShopController::class, 'show_blog'])->name('blog.show');
+    Route::get('/blogs', 'blogs')->name('blogs');
+    Route::get('/blogs/{slug}', 'show_blog')->name('blog.show');
 
-// use App\Http\Controllers\ContactController;
+    Route::get('/contact', 'contact')->name('contact');
+    Route::post('/contact', 'send')->middleware('throttle:5,1')->name('contact.send');
+});
 
-// Route::get('/contact', [ContactController::class, 'show'])->name('contact');
-Route::post('/contact', [ShopController::class, 'send'])->middleware('throttle:5,1')->name('contact.send');
 
 // ===== CART =====
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -40,7 +42,9 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.in
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/order/success/{orderNumber}', [CheckoutController::class, 'success'])->name('order.success');
 
-// ===== ADMIN =====
+
+
+// ===== CMS ADMIN PANEL =====
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('products/import', [ProductController::class, 'importForm'])->name('products.import.form');
     Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
@@ -54,13 +58,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
 
     // Sliders
-    Route::get('sliders', [\App\Http\Controllers\Admin\SliderController::class, 'index'])->name('sliders.index');
-    Route::get('sliders/create', [\App\Http\Controllers\Admin\SliderController::class, 'create'])->name('sliders.create');
-    Route::post('sliders', [\App\Http\Controllers\Admin\SliderController::class, 'store'])->name('sliders.store');
-    Route::get('sliders/{slider}/edit', [\App\Http\Controllers\Admin\SliderController::class, 'edit'])->name('sliders.edit');
-    Route::put('sliders/{slider}', [\App\Http\Controllers\Admin\SliderController::class, 'update'])->name('sliders.update');
-    Route::delete('sliders/{slider}', [\App\Http\Controllers\Admin\SliderController::class, 'destroy'])->name('sliders.destroy');
-    Route::post('sliders/reorder', [\App\Http\Controllers\Admin\SliderController::class, 'reorder'])->name('sliders.reorder');
+    Route::controller(SliderController::class)->group(function() {
+        Route::get('sliders', 'index')->name('sliders.index');
+        Route::get('sliders/create', 'create')->name('sliders.create');
+        Route::post('sliders', 'store')->name('sliders.store');
+        Route::get('sliders/{slider}/edit', 'edit')->name('sliders.edit');
+        Route::put('sliders/{slider}', 'update')->name('sliders.update');
+        Route::delete('sliders/{slider}', 'destroy')->name('sliders.destroy');
+        Route::post('sliders/reorder', 'reorder')->name('sliders.reorder');
+    });
 
 
     // Bulk actions
@@ -79,5 +85,27 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
 
 });
+
+
+
+
+// Customer auth routes
+Route::prefix('customer')->name('customer.')->group(function () {
+    Route::middleware('guest:customer')->group(function () {
+        Route::get('/login', [CustomerAuthController::class, 'showLoginForm'])->name('login');
+        Route::post('/login', [CustomerAuthController::class, 'login']);
+        Route::get('/register', [CustomerRegisterController::class, 'showRegistrationForm'])->name('register');
+        Route::post('/register', [CustomerRegisterController::class, 'register']);
+    });
+
+    Route::middleware('auth:customer')->group(function () {
+        Route::get('/dashboard', function () {
+            return view('customer.dashboard');
+        })->name('dashboard');
+
+        Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('logout');
+    });
+});
+
 
 require __DIR__.'/auth.php';

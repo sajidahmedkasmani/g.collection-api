@@ -100,9 +100,9 @@
                         @if(auth()->user()->is_admin)
                             <a href="{{ route('admin.dashboard') }}" class="hidden md:block text-xs text-rose font-medium">Admin</a>
                         @endif
-                        <form method="POST" action="{{ route('logout') }}" class="hidden md:inline">@csrf<button class="text-xs hover:text-rose">Logout</button></form>
+                        <form method="POST" action="{{ route('customer.logout') }}" class="hidden md:inline">@csrf<button class="text-xs hover:text-rose">Logout</button></form>
                     @else
-                        <a href="{{ route('login') }}" class="hidden md:block text-xs hover:text-rose">Login</a>
+                        <a href="{{ route('customer.login') }}" class="hidden md:block text-xs hover:text-rose">Login</a>
                     @endauth
                     <button class="md:hidden text-2xl" @click="open=!open" aria-label="Menu">☰</button>
                 </div>

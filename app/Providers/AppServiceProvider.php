@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
+use Illuminate\Session\DatabaseSessionHandler;
+use Illuminate\Support\Facades\Session;
+
+// Custom handler jo guard-aware ho
+
 class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void

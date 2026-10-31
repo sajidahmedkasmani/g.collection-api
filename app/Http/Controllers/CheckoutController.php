@@ -123,6 +123,7 @@ class CheckoutController extends Controller
     try {
         $order = Order::create([
             'order_number' => 'GC-' . strtoupper(Str::random(8)),
+            'customer_id'    => auth('customer')->id(),
             'customer_name' => $data['customer_name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
