@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('frontend.layout.master')
 
 @section('title', '404')
 

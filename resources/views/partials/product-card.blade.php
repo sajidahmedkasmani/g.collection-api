@@ -9,7 +9,7 @@
 <div class="group">
     {{-- image area: link + quick-add are siblings (no nested interactive elements) --}}
     <div class="relative aspect-[3/4] overflow-hidden rounded-2xl md:rounded-3xl bg-blush">
-        <a href="{{ route('product.show', $p->slug) }}" class="absolute inset-0 block" aria-label="{{ $p->name }}">
+        <a href="{{ route('product.details', $p->slug) }}" class="absolute inset-0 block" aria-label="{{ $p->name }}">
             <img src="{{ $img }}" alt="{{ $p->name }}" loading="lazy"
                  class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
             <span class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></span>
@@ -33,7 +33,7 @@
         </form>
     </div>
 
-    <a href="{{ route('product.show', $p->slug) }}" class="block pt-3">
+    <a href="{{ route('product.details', $p->slug) }}" class="block pt-3">
         <h3 class="text-[13px] md:text-sm leading-snug line-clamp-2 group-hover:text-plum transition">{{ $p->name }}</h3>
         <p class="text-sm font-medium mt-1">Rs. {{ number_format($price) }}</p>
     </a>

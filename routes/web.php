@@ -14,34 +14,36 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Controllers\CustomerRegisterController;
 
-// ===== PUBLIC =====
-Route::controller(ShopController::class)->group(function() {
-    Route::get('/', 'home')->name('home');
+// ===== FRONTEND ROUTES =====
+    Route::controller(ShopController::class)->group(function() {
+        Route::get('/', 'home')->name('home');
 
-    Route::get('/about-us', 'about')->name('aboutus');
+        Route::get('/about-us', 'about')->name('aboutus');
 
-    Route::get('/shop', 'index')->name('shop');
-    Route::get('/product/{slug}', 'show')->name('product.show');
+        Route::get('/shop', 'shop')->name('shop');
+        Route::get('/product/{slug}', 'product_details')->name('product.details');
 
-    Route::get('/blogs', 'blogs')->name('blogs');
-    Route::get('/blogs/{slug}', 'show_blog')->name('blog.show');
+        Route::get('/blogs', 'blogs')->name('blogs');
+        Route::get('/blogs/{slug}', 'blog_content')->name('blog.content');
 
-    Route::get('/contact', 'contact')->name('contact');
-    Route::post('/contact', 'send')->middleware('throttle:5,1')->name('contact.send');
-});
+        Route::get('/contact', 'contact')->name('contact');
+        Route::post('/contact', 'send')->middleware('throttle:5,1')->name('contact.send');
+    });
 
 
-// ===== CART =====
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
-Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+    // ===== CART =====
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/cart/update', [CartController::class, 'update'])->name('cart.update');
+    Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
-// ===== CHECKOUT =====
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-Route::get('/order/success/{orderNumber}', [CheckoutController::class, 'success'])->name('order.success');
+    // ===== CHECKOUT =====
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/order/success/{orderNumber}', [CheckoutController::class, 'success'])->name('order.success');
 
+
+// ===== FRONTEND ROUTES =====
 
 
 // ===== CMS ADMIN PANEL =====
@@ -104,6 +106,9 @@ Route::prefix('customer')->name('customer.')->group(function () {
         })->name('dashboard');
 
         Route::post('/logout', [CustomerAuthController::class, 'logout'])->name('logout');
+
+        Route::get('/profile', [CustomerProfileController::class, 'edit'])->name('profile.edit');
+Route::put('/profile', [CustomerProfileController::class, 'update'])->name('profile.update');
     });
 });
 
