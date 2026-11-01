@@ -290,7 +290,7 @@
     </section>
 <!-- {{-- ============ PLUM FEATURE ============ --}} -->
 
-{{-- ============ THE EDIT (pink) ============ --}}
+<!-- {{-- ============ THE EDIT (pink) ============ --}} -->
 <section class="bg-blush">
     <div class="max-w-7xl mx-auto px-6 py-24">
         <div class="flex justify-between text-[11px] uppercase tracking-[0.2em] text-plum/70 mb-10">
@@ -326,7 +326,7 @@
     </div>
 </section>
 
-{{-- ============ FIND YOUR PIECE ============ --}}
+<!-- {{-- ============ FIND YOUR PIECE ============ --}} -->
 <section class="bg-ink text-cream" x-data="{ f:'all', hover:0 }">
     <div class="max-w-7xl mx-auto px-6 py-24">
         <h2 class="font-serif text-5xl md:text-7xl mb-8">Find your piece.</h2>
@@ -381,52 +381,84 @@
             </div>
         </div>
     </section>
+
+    <section class="bg-cream text-black border-t border-cream/10">
+        <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12">
+            <div>
+                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">05 — Good to know</p>
+                <h2 class="font-serif text-5xl md:text-6xl mb-6">Shopping with<br>G. Collection</h2>
+                <p class="text-sm text-ink/60 max-w-sm leading-relaxed">A full collection of stitched and unstitched ladies' clothing, based in Karachi, Pakistan. Our team is available Mon–Sat 11:00 AM – 9:00 PM.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-10 content-start">
+                @foreach([
+                    ['Free shipping','On bills of Rs. 10,000 and above'],
+                    ['Pay your way','Cash on Delivery · Bank Transfer'],
+                    ['Talk to us','Mon–Sat 11:00 AM – 9:00 PM'],
+                    ['Based in','Karachi, Pakistan'],
+                ] as [$t,$d])
+                    <div class="border-t border-ink/20 pt-4">
+                        <p class="font-serif text-xl mb-1">{{ $t }}</p>
+                        <p class="text-xs text-ink/60">{{ $d }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
 <!-- {{-- ============ GOOD TO KNOW ============ --}} -->
 
 <!-- {{-- ============ FAQ ============ --}} -->
-    <section id="faq" class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-[320px_1fr] gap-12">
-        <div>
-            <h2 class="font-serif italic text-6xl text-plum mb-4">answered.</h2>
-            <p class="text-xs text-muted mb-6 max-w-[240px]">Can't find what you need? Talk to us on WhatsApp.</p>
-            <ul class="text-xs space-y-2">
-                @foreach(['All questions','Ordering & payments','Shipping & delivery','Sizes & products','Returns & exchanges','Customer support'] as $k => $c)
-                    <li class="px-3 py-2 rounded {{ $k===0 ? 'bg-plum text-white' : 'bg-black/5' }}">{{ $c }}</li>
-                @endforeach
-            </ul>
-            <div class="mt-8 text-xs text-muted space-y-1">
-                <p class="text-ink font-medium">Still wondering?</p>
-                <p>Mon–Sat, 11:00 AM – 9:00 PM</p>
-                <a href="https://wa.me/923347779231" class="text-plum underline block">WhatsApp +92 334 7779231</a>
-                <a href="mailto:support@gdotcollection.com" class="hover:text-rose block">support@gdotcollection.com</a>
-            </div>
-        </div>
 
-        <div class="grid md:grid-cols-2 gap-4 content-start" x-data="{ o:null }">
-            @foreach([
-                ['Ordering & payments','How do I pay?','Choose Cash on Delivery or Bank Transfer at checkout. Bank details appear on the confirmation page.'],
-                ['Ordering & payments','How does ordering work?','Browse the collection, add items to your cart, and proceed to checkout.'],
-                ['Ordering & payments','Can I change or cancel an order?','Contact us on WhatsApp as soon as possible and we will help before it ships.'],
-                ['Shipping & delivery','How much is shipping?','Free shipping on orders above Rs. 10,000. Below that, standard delivery charges apply.'],
-                ['Shipping & delivery','How long will delivery take?','Orders usually arrive within a few working days depending on your city.'],
-                ['Shipping & delivery','Where do you deliver?','We deliver across Pakistan from our Karachi base.'],
-                ['Sizes & products','What\'s the difference between stitched and unstitched?','Stitched is ready to wear. Unstitched is fabric you take to your own tailor.'],
-                ['Sizes & products','Which sizes and colours are available?','Each product page lists the sizes and colours currently in stock.'],
-                ['Sizes & products','What kind of pieces do you sell?','Embroidered, lace and lawn ladies\' clothing, stitched and unstitched, plus accessories.'],
-                ['Returns & exchanges','Can I exchange an item?','Please contact us via WhatsApp within 48 hours of delivery to discuss exchanges.'],
-                ['Returns & exchanges','How long do I have to return something?','Within 48 hours of delivery. Message us on WhatsApp to start.'],
-                ['Customer support','When is the team available?','Mon–Sat, 11:00 AM – 9:00 PM.'],
-                ['Customer support','How do I contact your team?','WhatsApp +92 334 7779231 or support@gdotcollection.com.'],
-                ['Customer support','What happens to my details?','We only use them to process and deliver your order.'],
-            ] as $n => [$cat_, $q, $a])
-                <div class="bg-ink text-cream rounded-xl p-5 cursor-pointer self-start" @click="o = (o==={{ $n }} ? null : {{ $n }})">
-                    <p class="text-[10px] uppercase tracking-[0.2em] text-rose mb-2">{{ $cat_ }}</p>
-                    <div class="flex justify-between items-start gap-4">
-                        <p class="font-serif text-lg leading-snug">{{ $q }}</p>
-                        <span class="w-6 h-6 shrink-0 rounded-full border border-cream/30 flex items-center justify-center text-sm" x-text="o==={{ $n }} ? '−' : '+'">+</span>
-                    </div>
-                    <p x-cloak x-show="o==={{ $n }}" x-collapse class="text-xs text-cream/70 mt-3 leading-relaxed">{{ $a }}</p>
+    <section id="faq" class="bg-[#fbeef3] ">
+        <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-[320px_1fr] gap-12">
+
+            <div>
+                <!-- <h2 class="font-serif italic text-6xl text-plum mb-4">answered.</h2> -->
+                <h2 class="font-serif  text-6xl mb-4">Questions,
+                    <em class="italic text-plum">
+                        answered.
+                    </em>
+                </h2>
+                <p class="text-xs text-muted mb-6 max-w-[240px]">Can't find what you need? Talk to us on WhatsApp.</p>
+                <ul class="text-xs space-y-2">
+                    @foreach(['All questions','Ordering & payments','Shipping & delivery','Sizes & products','Returns & exchanges','Customer support'] as $k => $c)
+                        <li class="px-3 py-2 rounded {{ $k===0 ? 'bg-plum text-white' : 'bg-black/5' }}">{{ $c }}</li>
+                    @endforeach
+                </ul>
+                <div class="mt-8 text-xs text-muted space-y-1">
+                    <p class="text-ink font-medium">Still wondering?</p>
+                    <p>Mon–Sat, 11:00 AM – 9:00 PM</p>
+                    <a href="https://wa.me/923347779231" class="text-plum underline block">WhatsApp +92 334 7779231</a>
+                    <a href="mailto:support@gdotcollection.com" class="hover:text-rose block">support@gdotcollection.com</a>
                 </div>
-            @endforeach
+            </div>
+    
+            <div class="grid md:grid-cols-2 gap-4 content-start" x-data="{ o:null }">
+                @foreach([
+                    ['Ordering & payments','How do I pay?','Choose Cash on Delivery or Bank Transfer at checkout. Bank details appear on the confirmation page.'],
+                    ['Ordering & payments','How does ordering work?','Browse the collection, add items to your cart, and proceed to checkout.'],
+                    ['Ordering & payments','Can I change or cancel an order?','Contact us on WhatsApp as soon as possible and we will help before it ships.'],
+                    ['Shipping & delivery','How much is shipping?','Free shipping on orders above Rs. 10,000. Below that, standard delivery charges apply.'],
+                    ['Shipping & delivery','How long will delivery take?','Orders usually arrive within a few working days depending on your city.'],
+                    ['Shipping & delivery','Where do you deliver?','We deliver across Pakistan from our Karachi base.'],
+                    ['Sizes & products','What\'s the difference between stitched and unstitched?','Stitched is ready to wear. Unstitched is fabric you take to your own tailor.'],
+                    ['Sizes & products','Which sizes and colours are available?','Each product page lists the sizes and colours currently in stock.'],
+                    ['Sizes & products','What kind of pieces do you sell?','Embroidered, lace and lawn ladies\' clothing, stitched and unstitched, plus accessories.'],
+                    ['Returns & exchanges','Can I exchange an item?','Please contact us via WhatsApp within 48 hours of delivery to discuss exchanges.'],
+                    ['Returns & exchanges','How long do I have to return something?','Within 48 hours of delivery. Message us on WhatsApp to start.'],
+                    ['Customer support','When is the team available?','Mon–Sat, 11:00 AM – 9:00 PM.'],
+                    ['Customer support','How do I contact your team?','WhatsApp +92 334 7779231 or support@gdotcollection.com.'],
+                    ['Customer support','What happens to my details?','We only use them to process and deliver your order.'],
+                ] as $n => [$cat_, $q, $a])
+                    <div class="bg-ink text-cream rounded-xl p-5 cursor-pointer self-start" @click="o = (o==={{ $n }} ? null : {{ $n }})">
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-rose mb-2">{{ $cat_ }}</p>
+                        <div class="flex justify-between items-start gap-4">
+                            <p class="font-serif text-lg leading-snug">{{ $q }}</p>
+                            <span class="w-6 h-6 shrink-0 rounded-full border border-cream/30 flex items-center justify-center text-sm" x-text="o==={{ $n }} ? '−' : '+'">+</span>
+                        </div>
+                        <p x-cloak x-show="o==={{ $n }}" x-collapse class="text-xs text-cream/70 mt-3 leading-relaxed">{{ $a }}</p>
+                    </div>
+                @endforeach
+            </div>
         </div>
     </section>
 <!-- {{-- ============ FAQ ============ --}} -->

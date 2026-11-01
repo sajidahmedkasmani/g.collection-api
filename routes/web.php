@@ -86,6 +86,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         ->name('users.toggle-active')->middleware('can:users.toggle-active');
 
 
+    Route::get('/queue-monitor', [App\Http\Controllers\Admin\QueueMonitorController::class, 'index'])->name('queue.monitor');
+    Route::post('/queue-monitor/retry', [App\Http\Controllers\Admin\QueueMonitorController::class, 'retryFailed'])->name('queue.retry');
+
+
 });
 
 

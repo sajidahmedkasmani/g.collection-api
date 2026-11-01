@@ -19,7 +19,8 @@
             theme: {
                 extend: {
                     colors: {
-                        cream: '#FAF7F2',
+                        // cream: '#FAF7F2',
+                        cream: 'rgb(250 243 234)',
                         ink: '#1F1215',
                         plum: '#5B1A4A',
                         // rose is a full scale now, so both `text-rose` and `bg-rose-600` work
