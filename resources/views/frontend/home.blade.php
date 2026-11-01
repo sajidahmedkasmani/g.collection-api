@@ -359,29 +359,6 @@
 @endif
 
 <!-- {{-- ============ GOOD TO KNOW ============ --}} -->
-    <section class="bg-ink text-cream border-t border-cream/10">
-        <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12">
-            <div>
-                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Good to know</p>
-                <h2 class="font-serif text-5xl md:text-6xl mb-6">Shopping with<br>G. Collection</h2>
-                <p class="text-sm text-cream/60 max-w-sm leading-relaxed">A full collection of stitched and unstitched ladies' clothing, based in Karachi, Pakistan. Our team is available Mon–Sat 11:00 AM – 9:00 PM.</p>
-            </div>
-            <div class="grid grid-cols-2 gap-x-8 gap-y-10 content-start">
-                @foreach([
-                    ['Free shipping','On bills of Rs. 10,000 and above'],
-                    ['Pay your way','Cash on Delivery · Bank Transfer'],
-                    ['Talk to us','Mon–Sat 11:00 AM – 9:00 PM'],
-                    ['Based in','Karachi, Pakistan'],
-                ] as [$t,$d])
-                    <div class="border-t border-cream/20 pt-4">
-                        <p class="font-serif text-xl mb-1">{{ $t }}</p>
-                        <p class="text-xs text-cream/60">{{ $d }}</p>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
     <section class="bg-cream text-black border-t border-cream/10">
         <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12">
             <div>
