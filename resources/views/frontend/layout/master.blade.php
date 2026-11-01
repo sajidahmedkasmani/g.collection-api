@@ -6,6 +6,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#FAF7F2">
     <meta name="google-site-verification" content="34nT_JEFzVeXLPCWFWLIy66AtSTk3QgX34tg0nbr8uw" />
+    <!-- <title>G.Collection | Women's Clothing & Bags Online in Pakistan</title> -->
+    <meta name="title" content="G.Collection | Women's Clothing & Bags Online in Pakistan">
+    <meta name="description" content="Shop stylish women's clothing, handbags and fashion accessories at G.Collection. Discover the latest fashion trends with delivery across Pakistan.">
     <title>@yield('title', 'G. Collection — Wear the Story, Every Stitch')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
