@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#FAF7F2">
+    <meta name="google-site-verification" content="34nT_JEFzVeXLPCWFWLIy66AtSTk3QgX34tg0nbr8uw" />
     <title>@yield('title', 'G. Collection — Wear the Story, Every Stitch')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +17,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
     <link rel="manifest" href="assets/favicon/site.webmanifest">
+
+
+    
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
