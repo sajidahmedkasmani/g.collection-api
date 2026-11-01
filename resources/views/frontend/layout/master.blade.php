@@ -74,7 +74,18 @@
         .nav-link:hover::after,.nav-link.active::after{transform:scaleX(1)}
         @media (prefers-reduced-motion:reduce){.marquee{animation:none}*{transition-duration:.01ms!important}}
     </style>
+
+    
     @stack('head')
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TK2W4MDWHH"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-TK2W4MDWHH');
+    </script>
 </head>
 
 <body class="font-sans antialiased"
