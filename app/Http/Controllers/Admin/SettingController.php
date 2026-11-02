@@ -10,8 +10,7 @@ class SettingController extends Controller
 {
     public function edit()
     {
-        $settings = Setting::pluck('value', 'key')->toArray();
-        return view('admin.settings', compact('settings'));
+        return redirect()->route('admin.cms.index', ['tab' => 'bank']);
     }
 
     public function update(Request $request)
@@ -24,9 +23,7 @@ class SettingController extends Controller
             'whatsapp_number' => 'nullable|string|max:20',
         ]);
 
-        foreach ($data as $k => $v) {
-            Setting::updateOrCreate(['key' => $k], ['value' => $v]);
-        }
+        Setting::setMany($data);
 
         return back()->with('success', 'Settings saved.');
     }

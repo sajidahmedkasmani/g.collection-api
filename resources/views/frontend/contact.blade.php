@@ -3,8 +3,11 @@
 
 @section('content')
 @php
-    $wa = '923347779231';
-    $email = 'support@gdotcollection.com';
+    $wa = clean_phone(setting('whatsapp_number', '923347779231'));
+    $phone = setting('contact_phone', '+92 334 7779231');
+    $email = setting('contact_email', 'support@gdotcollection.com');
+    $hours = setting('contact_hours', 'Mon–Sat, 11:00 AM – 9:00 PM');
+    $address = setting('contact_address', 'Karachi, Pakistan');
     $subjects = ['Order help', 'Returns & exchange', 'Product question', 'Bulk / wholesale', 'Something else'];
 @endphp
 
@@ -43,7 +46,7 @@
             </div>
             <p class="text-[11px] uppercase tracking-[0.2em] text-white/80 mb-1">Fastest reply</p>
             <p class="font-serif text-2xl mb-1">WhatsApp</p>
-            <p class="text-sm text-white/85">+92 334 7779231</p>
+            <p class="text-sm text-white/85">{{ $phone }}</p>
             <p class="text-xs mt-5 inline-flex items-center gap-2 group-hover:gap-3 transition-all">Chat now <span>→</span></p>
         </a>
 

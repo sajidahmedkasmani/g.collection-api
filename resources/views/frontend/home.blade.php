@@ -160,17 +160,35 @@
 
 <!-- {{-- ============ COLLECTIONS ============ --}} -->
     <section class="max-w-7xl mx-auto px-6 py-24">
-        <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-14">Three ways<br>to dress the day.</h2>
-        <p class="md:ml-auto md:max-w-[200px] text-xs text-muted -mt-24 mb-16 hidden md:block">Stitched, unstitched and everything that goes with it. Pick a collection to start.</p>
+        <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-14">{!! nl2br(e(setting('collections_title', "Three ways\nto dress the day."))) !!}</h2>
+        <p class="md:ml-auto md:max-w-[200px] text-xs text-muted -mt-24 mb-16 hidden md:block">{{ setting('collections_subtitle', 'Stitched, unstitched and everything that goes with it. Pick a collection to start.') }}</p>
 
         <div class="grid md:grid-cols-3 gap-5 items-end">
-            @foreach([
-                ['Stitched','stitched','h-[420px]', $p1],
-                ['Unstitched','unstitched','h-[360px] md:mb-0', $p2],
-                ['Accessories','accessories','h-[420px]', $p3],
-            ] as [$title,$slug,$h,$prod])
+            @php
+                $colCards = [
+                    [
+                        setting('collection_1_title', 'Stitched'),
+                        setting('collection_1_slug', 'stitched'),
+                        'h-[420px]',
+                        cms_image('collection_1_image', $ph($p1))
+                    ],
+                    [
+                        setting('collection_2_title', 'Unstitched'),
+                        setting('collection_2_slug', 'unstitched'),
+                        'h-[360px] md:mb-0',
+                        cms_image('collection_2_image', $ph($p2))
+                    ],
+                    [
+                        setting('collection_3_title', 'Accessories'),
+                        setting('collection_3_slug', 'accessories'),
+                        'h-[420px]',
+                        cms_image('collection_3_image', $ph($p3))
+                    ],
+                ];
+            @endphp
+            @foreach($colCards as [$title,$slug,$h,$imgUrl])
                 <a href="{{ route('shop') }}?category={{ $slug }}" class="group relative block {{ $h }} overflow-hidden rounded-t-[999px] bg-blush">
-                    <img src="{{ $ph($prod) }}" alt="{{ $title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" loading="lazy">
+                    <img src="{{ $imgUrl }}" alt="{{ $title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" loading="lazy">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                     <div class="absolute bottom-5 left-6 right-5 flex items-end justify-between text-white">
                         <p class="font-serif text-3xl">{{ $title }}</p>
@@ -201,8 +219,8 @@
 
                 <div>
                     <div class="flex items-start justify-between mb-8">
-                        <h2 class="font-serif text-5xl md:text-6xl leading-[1.02]">Most loved,<br>right now.</h2>
-                        <a href="{{ route('shop') }}" class="text-xs underline underline-offset-4 hover:text-rose">See all</a>
+                        <h2 class="font-serif text-5xl md:text-6xl leading-[1.02]">{!! nl2br(e(setting('most_loved_title', "Most loved,\nright now."))) !!}</h2>
+                        <a href="{{ setting('most_loved_link_url', route('shop')) }}" class="text-xs underline underline-offset-4 hover:text-rose">{{ setting('most_loved_link_text', 'See all') }}</a>
                     </div>
                     <div class="grid grid-cols-2 gap-5">
                         @foreach($list->slice(1,2) as $idx => $p)
@@ -246,13 +264,17 @@
 @endif
 
 <!-- {{-- ============ BIG MARQUEE ============ --}} -->
+    @php
+        $marqueeText = setting('marquee_items', 'Embroidery · Lace · Lawn · Cutwork');
+        $marqueeParts = array_filter(array_map('trim', explode('·', $marqueeText)));
+        if (empty($marqueeParts)) $marqueeParts = ['Embroidery', 'Lace', 'Lawn', 'Cutwork'];
+    @endphp
     <div class="overflow-hidden border-y border-black/10 py-6">
         <div class="marquee marquee-slow whitespace-nowrap font-serif italic text-6xl md:text-8xl">
             @for($m=0;$m<4;$m++)
-                <span class="mx-6">Embroidery</span><span class="text-rose">·</span>
-                <span class="mx-6">Lace</span><span class="text-rose">·</span>
-                <span class="mx-6">Lawn</span><span class="text-rose">·</span>
-                <span class="mx-6">Cutwork</span><span class="text-rose">·</span>
+                @foreach($marqueeParts as $part)
+                    <span class="mx-6">{{ $part }}</span><span class="text-rose">·</span>
+                @endforeach
             @endfor
         </div>
     </div>
@@ -261,29 +283,29 @@
 <!-- {{-- ============ PLUM FEATURE ============ --}} -->
     @if($list->count() && $first)
     <section class="bg-plum text-white relative overflow-hidden">
-        <p class="absolute -top-6 left-0 font-serif italic text-[220px] leading-none text-white/10 select-none pointer-events-none whitespace-nowrap">Lace. Fringe.</p>
+        <p class="absolute -top-6 left-0 font-serif italic text-[220px] leading-none text-white/10 select-none pointer-events-none whitespace-nowrap">{{ setting('plum_watermark', 'Lace. Fringe.') }}</p>
         <div class="max-w-7xl mx-auto px-6 py-28 relative">
             <div class="grid md:grid-cols-2 gap-14 items-center mb-24">
                 <div class="flex justify-center">
                     <div class="w-64 md:w-80 aspect-[3/5] overflow-hidden rounded-t-full bg-white/10">
-                        <img src="{{ $ph($first) }}" alt="" class="w-full h-full object-cover" loading="lazy">
+                        <img src="{{ cms_image('plum_b1_image', $ph($first)) }}" alt="" class="w-full h-full object-cover" loading="lazy">
                     </div>
                 </div>
                 <div>
-                    <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">Lace.<br><span class="italic text-rose">Fringe.</span><br>Cutwork.</h2>
-                    <p class="text-sm text-white/70 max-w-sm mb-8">Three details, one silhouette. Each piece is finished by hand in our Karachi workshop.</p>
-                    <a href="{{ route('product.details', $first->slug) }}" class="inline-flex items-center gap-2 bg-white text-plum text-xs rounded-full px-6 py-3 hover:bg-blush transition">Add to bag</a>
+                    <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">{!! setting('plum_b1_title', 'Lace.<br><span class="italic text-rose">Fringe.</span><br>Cutwork.') !!}</h2>
+                    <p class="text-sm text-white/70 max-w-sm mb-8">{{ setting('plum_b1_desc', 'Three details, one silhouette. Each piece is finished by hand in our Karachi workshop.') }}</p>
+                    <a href="{{ setting('plum_b1_btn_url', route('product.details', $first->slug)) }}" class="inline-flex items-center gap-2 bg-white text-plum text-xs rounded-full px-6 py-3 hover:bg-blush transition">{{ setting('plum_b1_btn_text', 'Add to bag') }}</a>
                 </div>
             </div>
             <div class="grid md:grid-cols-2 gap-14 items-center">
                 <div class="order-2 md:order-1">
-                    <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">Lace.<br><span class="italic text-rose">Fringe.</span><br>Cutwork.</h2>
-                    <p class="text-sm text-white/70 max-w-sm mb-8">These details make these pieces fit the collection, wear after wear.</p>
-                    <a href="{{ route('shop') }}" class="inline-flex items-center gap-2 border border-white/40 text-xs rounded-full px-6 py-3 hover:bg-white/10 transition">Shop the edit</a>
+                    <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">{!! setting('plum_b2_title', 'Lace.<br><span class="italic text-rose">Fringe.</span><br>Cutwork.') !!}</h2>
+                    <p class="text-sm text-white/70 max-w-sm mb-8">{{ setting('plum_b2_desc', 'These details make these pieces fit the collection, wear after wear.') }}</p>
+                    <a href="{{ setting('plum_b2_btn_url', route('shop')) }}" class="inline-flex items-center gap-2 border border-white/40 text-xs rounded-full px-6 py-3 hover:bg-white/10 transition">{{ setting('plum_b2_btn_text', 'Shop the edit') }}</a>
                 </div>
                 <div class="order-1 md:order-2 flex justify-center gap-4 items-end">
-                    <div class="w-48 md:w-64 aspect-[3/4] overflow-hidden bg-white/10"><img src="{{ $ph($p1) }}" alt="" class="w-full h-full object-cover" loading="lazy"></div>
-                    <div class="w-20 md:w-24 aspect-[3/4] overflow-hidden bg-white/10"><img src="{{ $ph($p2) }}" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+                    <div class="w-48 md:w-64 aspect-[3/4] overflow-hidden bg-white/10"><img src="{{ cms_image('plum_b2_image_1', $ph($p1)) }}" alt="" class="w-full h-full object-cover" loading="lazy"></div>
+                    <div class="w-20 md:w-24 aspect-[3/4] overflow-hidden bg-white/10"><img src="{{ cms_image('plum_b2_image_2', $ph($p2)) }}" alt="" class="w-full h-full object-cover" loading="lazy"></div>
                 </div>
             </div>
         </div>
@@ -294,13 +316,13 @@
 <section class="bg-blush">
     <div class="max-w-7xl mx-auto px-6 py-24">
         <div class="flex justify-between text-[11px] uppercase tracking-[0.2em] text-plum/70 mb-10">
-            <span>The Edit</span><span>Embroidery · Lace · Lawn</span><span>Karachi</span>
+            <span>{{ setting('edit_badge_1', 'The Edit') }}</span><span>{{ setting('edit_badge_2', 'Embroidery · Lace · Lawn') }}</span><span>{{ setting('edit_badge_3', 'Karachi') }}</span>
         </div>
         <div class="grid md:grid-cols-2 gap-12 items-center">
             <div>
-                <h2 class="font-serif text-6xl md:text-8xl leading-[0.98] text-ink mb-6">Made<br><span class="italic">by hand,</span><br>worn by<br>you.</h2>
-                <p class="text-sm text-ink/70 max-w-xs mb-6 leading-relaxed">Soft lace sleeves, fringed hems, scalloped cutwork borders. The details that make a hand-finished kurta.</p>
-                <a href="{{ route('shop') }}" class="inline-block bg-ink text-white text-xs rounded-full px-6 py-3 hover:bg-plum transition">Shop the edit</a>
+                <h2 class="font-serif text-6xl md:text-8xl leading-[0.98] text-ink mb-6">{!! setting('edit_title', 'Made<br><span class="italic">by hand,</span><br>worn by<br>you.') !!}</h2>
+                <p class="text-sm text-ink/70 max-w-xs mb-6 leading-relaxed">{{ setting('edit_desc', 'Soft lace sleeves, fringed hems, scalloped cutwork borders. The details that make a hand-finished kurta.') }}</p>
+                <a href="{{ setting('edit_btn_url', route('shop')) }}" class="inline-block bg-ink text-white text-xs rounded-full px-6 py-3 hover:bg-plum transition">{{ setting('edit_btn_text', 'Shop the edit') }}</a>
             </div>
             @if($p1)
             <a href="{{ route('product.details', $p1->slug) }}" class="block">
@@ -329,7 +351,7 @@
 <!-- {{-- ============ FIND YOUR PIECE ============ --}} -->
 <section class="bg-ink text-cream" x-data="{ f:'all', hover:0 }">
     <div class="max-w-7xl mx-auto px-6 py-24">
-        <h2 class="font-serif text-5xl md:text-7xl mb-8">Find your piece.</h2>
+        <h2 class="font-serif text-5xl md:text-7xl mb-8">{{ setting('find_piece_title', 'Find your piece.') }}</h2>
         <div class="flex flex-wrap gap-2 mb-10">
             @foreach(['all'=>'All','stitched'=>'Stitched','unstitched'=>'Unstitched','accessories'=>'Accessories'] as $k=>$label)
                 <button @click="f='{{ $k }}'" :class="f==='{{ $k }}' ? 'bg-rose text-white' : 'border border-cream/30 text-cream/80'" class="text-xs rounded-full px-4 py-1.5 transition">{{ $label }}</button>
@@ -362,44 +384,23 @@
     <section class="bg-ink text-cream border-t border-cream/10">
         <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12">
             <div>
-                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Good to know</p>
-                <h2 class="font-serif text-5xl md:text-6xl mb-6">Shopping with<br>G. Collection</h2>
-                <p class="text-sm text-cream/60 max-w-sm leading-relaxed">A full collection of stitched and unstitched ladies' clothing, based in Karachi, Pakistan. Our team is available Mon–Sat 11:00 AM – 9:00 PM.</p>
+                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">{{ setting('good_to_know_badge', 'Good to know') }}</p>
+                <h2 class="font-serif text-5xl md:text-6xl mb-6">{!! setting('good_to_know_title', 'Shopping with<br>G. Collection') !!}</h2>
+                <p class="text-sm text-cream/60 max-w-sm leading-relaxed">{{ setting('good_to_know_desc', "A full collection of stitched and unstitched ladies' clothing, based in Karachi, Pakistan. Our team is available Mon–Sat 11:00 AM – 9:00 PM.") }}</p>
             </div>
             <div class="grid grid-cols-2 gap-x-8 gap-y-10 content-start">
                 @foreach([
-                    ['Free shipping','On bills of Rs. 10,000 and above'],
-                    ['Pay your way','Cash on Delivery · Bank Transfer'],
-                    ['Talk to us','Mon–Sat 11:00 AM – 9:00 PM'],
-                    ['Based in','Karachi, Pakistan'],
+                    [setting('good_to_know_1_title', 'Free shipping'), setting('good_to_know_1_desc', 'On bills of Rs. 10,000 and above')],
+                    [setting('good_to_know_2_title', 'Pay your way'), setting('good_to_know_2_desc', 'Cash on Delivery · Bank Transfer')],
+                    [setting('good_to_know_3_title', 'Talk to us'), setting('good_to_know_3_desc', 'Mon–Sat 11:00 AM – 9:00 PM')],
+                    [setting('good_to_know_4_title', 'Based in'), setting('good_to_know_4_desc', 'Karachi, Pakistan')],
                 ] as [$t,$d])
-                    <div class="border-t border-cream/20 pt-4">
-                        <p class="font-serif text-xl mb-1">{{ $t }}</p>
-                        <p class="text-xs text-cream/60">{{ $d }}</p>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    <section class="bg-cream text-black border-t border-cream/10">
-        <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12">
-            <div>
-                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">05 — Good to know</p>
-                <h2 class="font-serif text-5xl md:text-6xl mb-6">Shopping with<br>G. Collection</h2>
-                <p class="text-sm text-ink/60 max-w-sm leading-relaxed">A full collection of stitched and unstitched ladies' clothing, based in Karachi, Pakistan. Our team is available Mon–Sat 11:00 AM – 9:00 PM.</p>
-            </div>
-            <div class="grid grid-cols-2 gap-x-8 gap-y-10 content-start">
-                @foreach([
-                    ['Free shipping','On bills of Rs. 10,000 and above'],
-                    ['Pay your way','Cash on Delivery · Bank Transfer'],
-                    ['Talk to us','Mon–Sat 11:00 AM – 9:00 PM'],
-                    ['Based in','Karachi, Pakistan'],
-                ] as [$t,$d])
-                    <div class="border-t border-ink/20 pt-4">
-                        <p class="font-serif text-xl mb-1">{{ $t }}</p>
-                        <p class="text-xs text-ink/60">{{ $d }}</p>
-                    </div>
+                    @if($t)
+                        <div class="border-t border-cream/20 pt-4">
+                            <p class="font-serif text-xl mb-1">{{ $t }}</p>
+                            <p class="text-xs text-cream/60">{{ $d }}</p>
+                        </div>
+                    @endif
                 @endforeach
             </div>
         </div>
@@ -407,57 +408,54 @@
 <!-- {{-- ============ GOOD TO KNOW ============ --}} -->
 
 <!-- {{-- ============ FAQ ============ --}} -->
-
-    <section id="faq" class="bg-[#fbeef3] ">
+    @php
+        $faqList = isset($faqs) ? $faqs : \App\Models\Faq::active()->get();
+        $faqCategories = $faqList->pluck('category')->unique()->values();
+    @endphp
+    <section id="faq" class="bg-[#fbeef3]" x-data="{ activeCat: 'All questions', o: null }">
         <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-[320px_1fr] gap-12">
-
             <div>
-                <!-- <h2 class="font-serif italic text-6xl text-plum mb-4">answered.</h2> -->
-                <h2 class="font-serif  text-6xl mb-4">Questions,
-                    <em class="italic text-plum">
-                        answered.
-                    </em>
+                <h2 class="font-serif text-6xl mb-4">
+                    {{ setting('faq_section_title', 'Questions, answered.') }}
                 </h2>
-                <p class="text-xs text-muted mb-6 max-w-[240px]">Can't find what you need? Talk to us on WhatsApp.</p>
+                <p class="text-xs text-muted mb-6 max-w-[240px]">{{ setting('faq_section_subtitle', "Can't find what you need? Talk to us on WhatsApp.") }}</p>
                 <ul class="text-xs space-y-2">
-                    @foreach(['All questions','Ordering & payments','Shipping & delivery','Sizes & products','Returns & exchanges','Customer support'] as $k => $c)
-                        <li class="px-3 py-2 rounded {{ $k===0 ? 'bg-plum text-white' : 'bg-black/5' }}">{{ $c }}</li>
+                    <li @click="activeCat = 'All questions'; o = null"
+                        :class="activeCat === 'All questions' ? 'bg-plum text-white font-medium' : 'bg-black/5 text-ink hover:bg-black/10'"
+                        class="px-3.5 py-2.5 rounded-xl cursor-pointer transition">
+                        All questions ({{ $faqList->count() }})
+                    </li>
+                    @foreach($faqCategories as $catName)
+                        <li @click="activeCat = '{{ addslashes($catName) }}'; o = null"
+                            :class="activeCat === '{{ addslashes($catName) }}' ? 'bg-plum text-white font-medium' : 'bg-black/5 text-ink hover:bg-black/10'"
+                            class="px-3.5 py-2.5 rounded-xl cursor-pointer transition">
+                            {{ $catName }}
+                        </li>
                     @endforeach
                 </ul>
                 <div class="mt-8 text-xs text-muted space-y-1">
                     <p class="text-ink font-medium">Still wondering?</p>
-                    <p>Mon–Sat, 11:00 AM – 9:00 PM</p>
-                    <a href="https://wa.me/923347779231" class="text-plum underline block">WhatsApp +92 334 7779231</a>
-                    <a href="mailto:support@gdotcollection.com" class="hover:text-rose block">support@gdotcollection.com</a>
+                    <p>{{ setting('faq_timing', 'Mon–Sat, 11:00 AM – 9:00 PM') }}</p>
+                    <a href="{{ whatsapp_link() }}" target="_blank" rel="noopener" class="text-plum underline block font-medium">WhatsApp {{ setting('contact_phone', '+92 334 7779231') }}</a>
+                    <a href="mailto:{{ setting('contact_email', 'support@gdotcollection.com') }}" class="hover:text-rose block">{{ setting('contact_email', 'support@gdotcollection.com') }}</a>
                 </div>
             </div>
     
-            <div class="grid md:grid-cols-2 gap-4 content-start" x-data="{ o:null }">
-                @foreach([
-                    ['Ordering & payments','How do I pay?','Choose Cash on Delivery or Bank Transfer at checkout. Bank details appear on the confirmation page.'],
-                    ['Ordering & payments','How does ordering work?','Browse the collection, add items to your cart, and proceed to checkout.'],
-                    ['Ordering & payments','Can I change or cancel an order?','Contact us on WhatsApp as soon as possible and we will help before it ships.'],
-                    ['Shipping & delivery','How much is shipping?','Free shipping on orders above Rs. 10,000. Below that, standard delivery charges apply.'],
-                    ['Shipping & delivery','How long will delivery take?','Orders usually arrive within a few working days depending on your city.'],
-                    ['Shipping & delivery','Where do you deliver?','We deliver across Pakistan from our Karachi base.'],
-                    ['Sizes & products','What\'s the difference between stitched and unstitched?','Stitched is ready to wear. Unstitched is fabric you take to your own tailor.'],
-                    ['Sizes & products','Which sizes and colours are available?','Each product page lists the sizes and colours currently in stock.'],
-                    ['Sizes & products','What kind of pieces do you sell?','Embroidered, lace and lawn ladies\' clothing, stitched and unstitched, plus accessories.'],
-                    ['Returns & exchanges','Can I exchange an item?','Please contact us via WhatsApp within 48 hours of delivery to discuss exchanges.'],
-                    ['Returns & exchanges','How long do I have to return something?','Within 48 hours of delivery. Message us on WhatsApp to start.'],
-                    ['Customer support','When is the team available?','Mon–Sat, 11:00 AM – 9:00 PM.'],
-                    ['Customer support','How do I contact your team?','WhatsApp +92 334 7779231 or support@gdotcollection.com.'],
-                    ['Customer support','What happens to my details?','We only use them to process and deliver your order.'],
-                ] as $n => [$cat_, $q, $a])
-                    <div class="bg-ink text-cream rounded-xl p-5 cursor-pointer self-start" @click="o = (o==={{ $n }} ? null : {{ $n }})">
-                        <p class="text-[10px] uppercase tracking-[0.2em] text-rose mb-2">{{ $cat_ }}</p>
+            <div class="grid md:grid-cols-2 gap-4 content-start">
+                @forelse($faqList as $n => $faqItem)
+                    <div x-show="activeCat === 'All questions' || activeCat === '{{ addslashes($faqItem->category) }}'"
+                         class="bg-ink text-cream rounded-xl p-5 cursor-pointer self-start transition hover:ring-1 hover:ring-rose/40"
+                         @click="o = (o === {{ $n }} ? null : {{ $n }})">
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-rose mb-2">{{ $faqItem->category }}</p>
                         <div class="flex justify-between items-start gap-4">
-                            <p class="font-serif text-lg leading-snug">{{ $q }}</p>
-                            <span class="w-6 h-6 shrink-0 rounded-full border border-cream/30 flex items-center justify-center text-sm" x-text="o==={{ $n }} ? '−' : '+'">+</span>
+                            <p class="font-serif text-lg leading-snug">{{ $faqItem->question }}</p>
+                            <span class="w-6 h-6 shrink-0 rounded-full border border-cream/30 flex items-center justify-center text-sm" x-text="o === {{ $n }} ? '−' : '+'">+</span>
                         </div>
-                        <p x-cloak x-show="o==={{ $n }}" x-collapse class="text-xs text-cream/70 mt-3 leading-relaxed">{{ $a }}</p>
+                        <p x-cloak x-show="o === {{ $n }}" x-collapse class="text-xs text-cream/70 mt-3 leading-relaxed">{{ $faqItem->answer }}</p>
                     </div>
-                @endforeach
+                @empty
+                    <p class="text-sm text-gray-500">No questions available right now.</p>
+                @endforelse
             </div>
         </div>
     </section>
@@ -467,9 +465,9 @@
     <section class="bg-blush">
         <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center">
             <div>
-                <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">Be first<br>to see<br><span class="italic text-plum">what's new.</span></h2>
-                <p class="text-sm text-ink/70 max-w-sm mb-8">New arrivals and news from G. Collection, in your inbox. Just your email, nothing else.</p>
-                <form onsubmit="event.preventDefault(); alert('Thanks! (newsletter backend later)');">
+                <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">{!! setting('newsletter_title', "Be first<br>to see<br><span class=\"italic text-plum\">what's new.</span>") !!}</h2>
+                <p class="text-sm text-ink/70 max-w-sm mb-8">{{ setting('newsletter_desc', 'New arrivals and news from G. Collection, in your inbox. Just your email, nothing else.') }}</p>
+                <form onsubmit="event.preventDefault(); alert('Thank you for subscribing to G. Collection newsletter!');">
                     <label class="text-[11px] uppercase tracking-[0.2em] text-ink/60">Email</label>
                     <div class="flex border-b border-ink">
                         <input type="email" required placeholder="you@example.com" class="flex-1 bg-transparent py-3 text-lg focus:outline-none placeholder:text-black/30">
@@ -479,7 +477,7 @@
             </div>
             <div class="flex justify-center">
                 <div class="w-64 md:w-80 aspect-[3/4] bg-plum rounded-t-full flex items-center justify-center">
-                    <span class="font-serif italic text-white text-[160px] leading-none">G<span class="text-rose">.</span></span>
+                    <span class="font-serif italic text-white text-[160px] leading-none">{{ setting('newsletter_monogram', 'G.') }}</span>
                 </div>
             </div>
         </div>

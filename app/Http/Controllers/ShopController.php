@@ -16,7 +16,8 @@ class ShopController extends Controller
     {
         $sliders = \App\Models\HomeSlider::active()->get();
         $products = Product::where('is_active', true)->latest()->take(8)->get();
-        return view('frontend.home', compact('products', 'sliders'));
+        $faqs = \App\Models\Faq::active()->get();
+        return view('frontend.home', compact('products', 'sliders', 'faqs'));
     }
 
     public function about()
@@ -69,8 +70,9 @@ class ShopController extends Controller
             Log::info('Contact form', $data);
 
             try {
-                Mail::raw($body, function ($m) use ($data) {
-                    $m->to('support@gdotcollection.com')
+                $recipient = setting('contact_email', 'support@gdotcollection.com');
+                Mail::raw($body, function ($m) use ($data, $recipient) {
+                    $m->to($recipient)
                     ->replyTo($data['email'], $data['name'])
                     ->subject('[G. Collection] ' . $data['subject'] . ' — ' . $data['name']);
                 });

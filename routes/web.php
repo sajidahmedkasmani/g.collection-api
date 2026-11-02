@@ -10,9 +10,12 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Admin\CmsController;
+use App\Http\Controllers\Admin\FaqController;
 
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Controllers\CustomerRegisterController;
+use App\Http\Controllers\CustomerProfileController;
 
 // ===== FRONTEND ROUTES =====
     Route::controller(ShopController::class)->group(function() {
@@ -57,6 +60,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
     Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // Website CMS & Content
+    Route::get('cms', [CmsController::class, 'index'])->name('cms.index');
+    Route::post('cms', [CmsController::class, 'update'])->name('cms.update');
+
+    // FAQs CMS
+    Route::resource('faqs', FaqController::class);
+    Route::post('faqs/{faq}/toggle-active', [FaqController::class, 'toggleActive'])->name('faqs.toggle-active');
 
 
     // Sliders
