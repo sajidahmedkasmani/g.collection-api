@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#FAF7F2">
+    <meta name="google-site-verification" content="34nT_JEFzVeXLPCWFWLIy66AtSTk3QgX34tg0nbr8uw" />
+    <!-- <title>G.Collection | Women's Clothing & Bags Online in Pakistan</title> -->
+    <meta name="title" content="G.Collection | Women's Clothing & Bags Online in Pakistan">
+    <meta name="description" content="Shop stylish women's clothing, handbags and fashion accessories at G.Collection. Discover the latest fashion trends with delivery across Pakistan.">
     <title>@yield('title', 'G. Collection — Wear the Story, Every Stitch')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,6 +20,9 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
     <link rel="manifest" href="assets/favicon/site.webmanifest">
+
+
+    
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
@@ -67,7 +74,18 @@
         .nav-link:hover::after,.nav-link.active::after{transform:scaleX(1)}
         @media (prefers-reduced-motion:reduce){.marquee{animation:none}*{transition-duration:.01ms!important}}
     </style>
+
+    
     @stack('head')
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TK2W4MDWHH"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-TK2W4MDWHH');
+    </script>
 </head>
 
 <body class="font-sans antialiased"
