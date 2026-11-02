@@ -54,6 +54,7 @@
                     {{ ucfirst($order->status) }}
                 </span>
             </p>
+            @can('orders.edit')
             <form action="{{ route('admin.orders.status', $order) }}" method="POST">
                 @csrf
                 <select name="status" class="w-full border rounded-lg px-3 py-2 text-sm mb-2">
@@ -63,6 +64,7 @@
                 </select>
                 <button class="w-full bg-blue-600 text-white py-2 rounded-lg text-sm">Update Status</button>
             </form>
+            @endcan
         </div>
 
         <div class="bg-white rounded-xl shadow-sm p-6">

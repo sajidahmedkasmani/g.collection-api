@@ -12,9 +12,11 @@
             <a href="{{ route('admin.cms.index') }}" class="bg-white soft text-gray-700 hover:text-brand-600 px-4 py-2.5 rounded-xl text-xs font-medium transition">
                 ← Back to CMS
             </a>
+            @can('faqs.create')
             <a href="{{ route('admin.faqs.create') }}" class="btn-bloom text-white px-5 py-2.5 rounded-xl text-xs font-semibold hover:opacity-90 transition flex items-center gap-1.5 shadow-sm">
                 <span class="text-base leading-none">+</span> Add New FAQ
             </a>
+            @endcan
         </div>
     </div>
 
@@ -41,9 +43,11 @@
                 <span class="text-4xl block mb-2">❓</span>
                 <p class="text-base font-medium text-gray-600">No FAQs found</p>
                 <p class="text-xs text-gray-400 mt-1">Get started by creating your first frequently asked question.</p>
+                @can('faqs.create')
                 <a href="{{ route('admin.faqs.create') }}" class="mt-4 inline-block btn-bloom text-white px-5 py-2 rounded-xl text-xs font-semibold">
                     + Add First FAQ
                 </a>
+                @endcan
             </div>
         @else
             <div class="overflow-x-auto">
@@ -73,17 +77,24 @@
                                     <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ $faq->answer }}</p>
                                 </td>
                                 <td class="py-4 px-5 text-center">
+                                    @can('faqs.edit')
                                     <form action="{{ route('admin.faqs.toggle-active', $faq) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="px-3 py-1 rounded-full text-[11px] font-semibold transition {{ $faq->is_active ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' }}">
                                             {{ $faq->is_active ? 'Active' : 'Hidden' }}
                                         </button>
                                     </form>
+                                    @else
+                                    <span class="text-xs text-gray-500">{{ $faq->is_active ? 'Active' : 'Hidden' }}</span>
+                                    @endcan
                                 </td>
                                 <td class="py-4 px-5 text-right space-x-2">
+                                    @can('faqs.edit')
                                     <a href="{{ route('admin.faqs.edit', $faq) }}" class="inline-flex items-center text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 px-3 py-1.5 rounded-lg transition">
                                         Edit
                                     </a>
+                                    @endcan
+                                    @can('faqs.delete')
                                     <form action="{{ route('admin.faqs.destroy', $faq) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this FAQ?');">
                                         @csrf
                                         @method('DELETE')
@@ -91,6 +102,7 @@
                                             Delete
                                         </button>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                         @endforeach

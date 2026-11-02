@@ -8,10 +8,10 @@
     $name = explode(' ', trim(auth()->user()->name ?? 'Admin'))[0];
 
     $cards = [
-        'products'       => ['Products',      'from-brand-400 to-brand-600',  'bg-brand-100',  'M20 7l-8-4-8 4m16 0v10l-8 4m8-14l-8 4m0 10L4 17V7m8 14V11', 'admin.products.index'],
-        'orders'         => ['Orders',        'from-sky-400 to-sky-600',      'bg-sky-100',    'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6M9 12h6M9 16h4', 'admin.orders.index'],
-        'pending_orders' => ['Pending',       'from-amber-300 to-orange-400', 'bg-amber-100',  'M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z', 'admin.orders.index'],
-        'revenue'        => ['Revenue (Rs.)', 'from-bloom-400 to-bloom-500',  'bg-pink-100',   'M12 8c-1.7 0-3 .9-3 2s1.3 2 3 2 3 .9 3 2-1.3 2-3 2m0-8V6m0 12v-2m9-4a9 9 0 11-18 0 9 9 0 0118 0z', 'admin.orders.index'],
+        'products'       => ['Products',      'from-brand-400 to-brand-600',  'bg-brand-100',  'M20 7l-8-4-8 4m16 0v10l-8 4m8-14l-8 4m0 10L4 17V7m8 14V11', 'admin.products.index', 'products.view'],
+        'orders'         => ['Orders',        'from-sky-400 to-sky-600',      'bg-sky-100',    'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6M9 12h6M9 16h4', 'admin.orders.index', 'orders.view'],
+        'pending_orders' => ['Pending',       'from-amber-300 to-orange-400', 'bg-amber-100',  'M12 8v4l3 2m6-2a9 9 0 11-18 0 9 9 0 0118 0z', 'admin.orders.index', 'orders.view'],
+        'revenue'        => ['Revenue (Rs.)', 'from-bloom-400 to-bloom-500',  'bg-pink-100',   'M12 8c-1.7 0-3 .9-3 2s1.3 2 3 2 3 .9 3 2-1.3 2-3 2m0-8V6m0 12v-2m9-4a9 9 0 11-18 0 9 9 0 0118 0z', 'admin.orders.index', 'orders.view'],
     ];
 
     $badge = [
@@ -48,6 +48,7 @@
     <div class="relative max-w-xl">
         <p class="text-xs text-white/70 mb-1">{{ now('Asia/Karachi')->format('l, d F Y') }}</p>
         <h2 class="text-2xl md:text-3xl font-semibold leading-tight">{{ $greet }}, {{ $name }} 👋</h2>
+        @can('orders.view')
         <p class="text-sm text-white/80 mt-2">
             @if($pending > 0)
                 You have <span class="font-semibold text-white">{{ $pending }} pending {{ \Illuminate\Support\Str::plural('order', $pending) }}</span> waiting for you.
@@ -55,16 +56,24 @@
                 You're all caught up. No pending orders right now.
             @endif
         </p>
+        @else
+        <p class="text-sm text-white/80 mt-2">Welcome to your admin dashboard.</p>
+        @endcan
         <div class="flex flex-wrap gap-2 mt-5">
+            @can('orders.view')
             <a href="{{ route('admin.orders.index') }}" class="btn-bloom text-xs font-medium rounded-xl px-5 py-2.5 hover:opacity-90 transition">View orders</a>
+            @endcan
+            @can('products.view')
             <a href="{{ route('admin.products.index') }}" class="bg-white/20 hover:bg-white/30 transition text-xs font-medium rounded-xl px-5 py-2.5">Manage products</a>
+            @endcan
         </div>
     </div>
 </div>
 
 {{-- STAT CARDS --}}
 <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-5 mb-5 md:mb-6">
-    @foreach($cards as $k => [$label,$grad,$tint,$icon,$route])
+    @foreach($cards as $k => [$label,$grad,$tint,$icon,$route,$permission])
+        @can($permission)
         <a href="{{ route($route) }}" class="rise lift relative overflow-hidden bg-white rounded-2xl soft p-4 md:p-5 block" style="--d:{{ 0.06 * ($loop->index + 1) }}s">
             <div class="absolute -right-5 -top-5 w-20 h-20 rounded-full {{ $tint }} opacity-70"></div>
             <div class="relative">
@@ -77,9 +86,11 @@
                    x-text="v.toLocaleString()">{{ number_format($stats[$k] ?? 0) }}</p>
             </div>
         </a>
+        @endcan
     @endforeach
 </div>
 
+@can('orders.view')
 <div class="grid xl:grid-cols-3 gap-5 md:gap-6">
 
     {{-- LEFT: chart + orders --}}
@@ -215,12 +226,16 @@
                 <a href="{{ Route::has('admin.products.create') ? route('admin.products.create') : route('admin.products.index') }}" class="lift rounded-2xl bg-brand-50 text-brand-600 p-4 font-medium">
                     <span class="block text-xl mb-1">＋</span>Add product
                 </a>
+                @can('orders.view')
                 <a href="{{ route('admin.orders.index') }}" class="lift rounded-2xl bg-amber-50 text-amber-600 p-4 font-medium">
                     <span class="block text-xl mb-1">🧾</span>Orders
                 </a>
+                @endcan
+                @can('settings.view')
                 <a href="{{ route('admin.settings.edit') }}" class="lift rounded-2xl bg-sky-50 text-sky-600 p-4 font-medium">
                     <span class="block text-xl mb-1">⚙️</span>Settings
                 </a>
+                @endcan
                 <a href="{{ route('home') }}" class="lift rounded-2xl bg-pink-50 text-bloom-500 p-4 font-medium">
                     <span class="block text-xl mb-1">🛍️</span>View site
                 </a>
@@ -228,4 +243,5 @@
         </div>
     </div>
 </div>
+@endcan
 @endsection

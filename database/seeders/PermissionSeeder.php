@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Permission;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 
 class PermissionSeeder extends Seeder
 {
@@ -11,33 +12,53 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             // Products
-            ['name' => 'products.view',        'label' => 'View Products',         'module' => 'products'],
-            ['name' => 'products.create',      'label' => 'Create Products',       'module' => 'products'],
-            ['name' => 'products.edit',        'label' => 'Edit Products',         'module' => 'products'],
-            ['name' => 'products.delete',      'label' => 'Delete Products',       'module' => 'products'],
-            ['name' => 'products.bulk-delete', 'label' => 'Bulk Delete Products',  'module' => 'products'],
-            ['name' => 'products.bulk-status', 'label' => 'Bulk Status Update',    'module' => 'products'],
+            ['name' => 'products.view',        'label' => 'View Products',          'module' => 'Products'],
+            ['name' => 'products.create',      'label' => 'Create & Import Products','module' => 'Products'],
+            ['name' => 'products.edit',        'label' => 'Edit Products & Stock',  'module' => 'Products'],
+            ['name' => 'products.delete',      'label' => 'Delete Products',        'module' => 'Products'],
+            ['name' => 'products.bulk-delete', 'label' => 'Bulk Delete Products',   'module' => 'Products'],
+            ['name' => 'products.bulk-status', 'label' => 'Bulk Status Update',     'module' => 'Products'],
 
             // Orders
-            ['name' => 'orders.view',   'label' => 'View Orders',   'module' => 'orders'],
-            ['name' => 'orders.edit',   'label' => 'Edit Orders',   'module' => 'orders'],
-            ['name' => 'orders.delete', 'label' => 'Delete Orders', 'module' => 'orders'],
+            ['name' => 'orders.view',          'label' => 'View Orders',            'module' => 'Orders'],
+            ['name' => 'orders.edit',          'label' => 'Update Order Status',    'module' => 'Orders'],
+            ['name' => 'orders.delete',        'label' => 'Delete Orders',          'module' => 'Orders'],
+
+            // Sliders
+            ['name' => 'sliders.view',         'label' => 'View Sliders',           'module' => 'Sliders'],
+            ['name' => 'sliders.create',       'label' => 'Create Sliders',         'module' => 'Sliders'],
+            ['name' => 'sliders.edit',         'label' => 'Edit & Reorder Sliders', 'module' => 'Sliders'],
+            ['name' => 'sliders.delete',       'label' => 'Delete Sliders',         'module' => 'Sliders'],
+
+            // CMS / Website Content
+            ['name' => 'cms.view',             'label' => 'View CMS Content',       'module' => 'CMS Content'],
+            ['name' => 'cms.edit',             'label' => 'Update CMS Sections',    'module' => 'CMS Content'],
+
+            // FAQs
+            ['name' => 'faqs.view',            'label' => 'View FAQs',              'module' => 'FAQs'],
+            ['name' => 'faqs.create',          'label' => 'Create FAQs',            'module' => 'FAQs'],
+            ['name' => 'faqs.edit',            'label' => 'Edit & Toggle FAQs',     'module' => 'FAQs'],
+            ['name' => 'faqs.delete',          'label' => 'Delete FAQs',            'module' => 'FAQs'],
+
+            // Settings & Bank Details
+            ['name' => 'settings.view',        'label' => 'View Settings',          'module' => 'Settings'],
+            ['name' => 'settings.edit',        'label' => 'Update Settings & Bank', 'module' => 'Settings'],
 
             // Users
-            ['name' => 'users.view',              'label' => 'View Users',              'module' => 'users'],
-            ['name' => 'users.create',            'label' => 'Create Users',            'module' => 'users'],
-            ['name' => 'users.edit',              'label' => 'Edit Users',              'module' => 'users'],
-            ['name' => 'users.delete',            'label' => 'Delete Users',            'module' => 'users'],
-            ['name' => 'users.toggle-active',     'label' => 'Activate/Deactivate Users','module' => 'users'],
-            ['name' => 'users.manage-permissions','label' => 'Manage User Permissions', 'module' => 'users'],
+            ['name' => 'users.view',           'label' => 'View Admin Users',       'module' => 'Users'],
+            ['name' => 'users.create',         'label' => 'Create Admin Users',     'module' => 'Users'],
+            ['name' => 'users.edit',           'label' => 'Edit Users & Permissions','module' => 'Users'],
+            ['name' => 'users.delete',         'label' => 'Delete Users',           'module' => 'Users'],
+            ['name' => 'users.toggle-active',  'label' => 'Toggle Active Status',   'module' => 'Users'],
 
-            // Settings
-            ['name' => 'settings.view', 'label' => 'View Settings', 'module' => 'settings'],
-            ['name' => 'settings.edit', 'label' => 'Edit Settings', 'module' => 'settings'],
+            // Queue Monitor
+            ['name' => 'queue.view',           'label' => 'View Queue Monitor',     'module' => 'Queue Monitor'],
         ];
 
         foreach ($permissions as $p) {
             Permission::updateOrCreate(['name' => $p['name']], $p);
         }
+
+        Cache::forget('permission_names');
     }
 }

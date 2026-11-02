@@ -75,6 +75,14 @@
         ['Sliders',  'admin.sliders.index',  'admin.sliders.index',  'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z'],
         ['Users',  'admin.users.index',  'admin.users.index',  'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z'],
     ];
+    $navPermissions = [
+        'admin.dashboard' => 'admin.dashboard',
+        'admin.products.index' => 'products.view',
+        'admin.orders.index' => 'orders.view',
+        'admin.settings.edit' => 'settings.view',
+        'admin.sliders.index' => 'sliders.view',
+        'admin.users.index' => 'users.view',
+    ];
     $user = auth()->user();
     $initial = strtoupper(substr($user->name ?? 'A', 0, 1));
 @endphp
@@ -86,10 +94,12 @@
         <div class="rail hidden md:flex w-[72px] shrink-0 flex-col items-center py-5 gap-3 text-white/80">
             <a href="{{ route('admin.dashboard') }}" class="w-10 h-10 mb-4 rounded-full bg-white/25 flex items-center justify-center text-white font-semibold">G</a>
             @foreach($nav as [$label,$route,$pattern,$icon])
+                @can($navPermissions[$route])
                 <a href="{{ route($route) }}" title="{{ $label }}"
                    class="w-11 h-11 rounded-xl flex items-center justify-center transition {{ request()->routeIs($pattern) ? 'bg-white/25 text-white shadow-inner' : 'hover:bg-white/15' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="{{ $icon }}"/></svg>
                 </a>
+                @endcan
             @endforeach
             <a href="{{ route('home') }}" title="View site" class="mt-auto w-11 h-11 rounded-xl flex items-center justify-center hover:bg-white/15 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>
@@ -103,19 +113,23 @@
                 <span class="font-semibold tracking-wide">G. ADMIN</span>
             </a>
 
-            <a href="{{ Route::has('admin.products.create') ? route('admin.products.create') : route('admin.products.index') }}"
+            @can('products.create')
+            <a href="{{ route('admin.products.create') }}"
                class="btn-bloom text-white rounded-xl py-3 px-4 flex items-center justify-center gap-2 text-sm font-medium mb-7 hover:opacity-90 transition">
                 <span class="text-lg leading-none">+</span> Add Product
             </a>
+            @endcan
 
             <p class="text-[11px] text-gray-400 mb-3 px-1">Manage</p>
             <nav class="space-y-1 text-sm flex-1">
                 @foreach($nav as [$label,$route,$pattern,$icon])
+                    @can($navPermissions[$route])
                     <a href="{{ route($route) }}"
                        class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition {{ request()->routeIs($pattern) ? 'bg-brand-50 text-brand-600 font-medium' : 'text-gray-500 hover:bg-gray-50 hover:text-ink' }}">
                         <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="{{ $icon }}"/></svg>
                         {{ $label }}
                     </a>
+                    @endcan
                 @endforeach
             </nav>
 
@@ -136,6 +150,7 @@
                 </div>
 
                 <div class="flex items-center gap-3">
+                    @can('orders.view')
                     <form method="GET" action="{{ route('admin.orders.index') }}" class="hidden lg:flex items-center gap-2 bg-white/80 rounded-xl px-4 py-2 text-xs w-64 focus-within:ring-2 ring-brand-200 transition">
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>
                         <input name="q" type="search" placeholder="Search orders..." class="bg-transparent outline-none w-full placeholder:text-gray-400">
@@ -144,6 +159,7 @@
                     <a href="{{ route('admin.orders.index') }}" class="w-9 h-9 rounded-xl bg-white soft flex items-center justify-center text-gray-500 hover:text-brand-600 transition" aria-label="Orders">
                         <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
+                    @endcan
 
                     {{-- profile dropdown --}}
                     <div class="relative" x-data="{ o:false }" @click.outside="o=false" @keydown.escape.window="o=false">
@@ -158,7 +174,9 @@
                                 <p class="text-[11px] text-gray-400 truncate">{{ $user->email ?? '' }}</p>
                             </div>
                             <a href="{{ route('home') }}" class="block px-3 py-2 rounded-xl hover:bg-brand-50 text-gray-600">View site</a>
+                            @can('settings.view')
                             <a href="{{ route('admin.settings.edit') }}" class="block px-3 py-2 rounded-xl hover:bg-brand-50 text-gray-600">Settings</a>
+                            @endcan
                             <form method="POST" action="{{ route('logout') }}">@csrf
                                 <button class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-500">Logout</button>
                             </form>
@@ -184,11 +202,13 @@
 <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 bg-gradient-to-t from-lav via-lav/95 to-transparent">
     <div class="bg-white rounded-2xl soft border border-white grid grid-cols-4 p-1.5">
         @foreach($nav as [$label,$route,$pattern,$icon])
+            @can($navPermissions[$route])
             @php $on = request()->routeIs($pattern); @endphp
             <a href="{{ route($route) }}" class="flex flex-col items-center gap-0.5 py-2 rounded-xl text-[10px] transition {{ $on ? 'bg-brand-50 text-brand-600 font-medium' : 'text-gray-400' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="{{ $icon }}"/></svg>
                 {{ $label }}
             </a>
+            @endcan
         @endforeach
     </div>
 </nav>

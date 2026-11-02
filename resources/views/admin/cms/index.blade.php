@@ -35,15 +35,19 @@
                 class="px-5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-2">
             <span>📢</span> Announcement Bar
         </button>
+        @can('settings.view')
         <button type="button" @click="tab = 'bank'"
                 :class="tab === 'bank' ? 'bg-brand-500 text-white shadow-sm' : 'text-gray-600 hover:bg-white'"
                 class="px-5 py-2.5 rounded-xl text-xs font-semibold transition flex items-center gap-2">
             <span>🏦</span> Bank Details
         </button>
+        @endcan
+        @can('faqs.view')
         <a href="{{ route('admin.faqs.index') }}"
            class="px-5 py-2.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-white transition flex items-center gap-2 ml-auto">
             <span>❓</span> Manage FAQs →
         </a>
+        @endcan
     </div>
 
     {{-- ==================== TAB 1: HOME PAGE ==================== --}}
@@ -559,6 +563,7 @@
     </div>
 
     {{-- ==================== TAB 4: BANK DETAILS ==================== --}}
+    @can('settings.view')
     <div x-show="tab === 'bank'" x-cloak>
         <form action="{{ route('admin.cms.update') }}" method="POST" class="space-y-6">
             @csrf
@@ -596,11 +601,14 @@
                 </div>
 
                 <div class="flex justify-end pt-6">
+                    @can('settings.edit')
                     <button type="submit" class="btn-bloom text-white px-8 py-3 rounded-xl text-sm font-medium hover:opacity-90 transition">
                         Save Bank Details
                     </button>
+                    @endcan
                 </div>
             </div>
+            @endcan
         </form>
     </div>
 

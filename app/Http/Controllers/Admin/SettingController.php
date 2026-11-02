@@ -10,7 +10,9 @@ class SettingController extends Controller
 {
     public function edit()
     {
-        return redirect()->route('admin.cms.index', ['tab' => 'bank']);
+        $settings = Setting::pluck('value', 'key')->toArray();
+
+        return view('admin.settings', compact('settings'));
     }
 
     public function update(Request $request)

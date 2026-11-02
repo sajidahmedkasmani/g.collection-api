@@ -11,6 +11,10 @@ class CmsController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->get('tab') === 'bank') {
+            abort_unless($request->user()->can('settings.view'), 403);
+        }
+
         $settings = Setting::pluck('value', 'key')->toArray();
         $activeTab = $request->get('tab', 'home');
         return view('admin.cms.index', compact('settings', 'activeTab'));
@@ -19,6 +23,12 @@ class CmsController extends Controller
     public function update(Request $request)
     {
         $tab = $request->input('_tab', 'home');
+
+        $bankFields = ['bank_name', 'bank_account_title', 'bank_account_no', 'bank_iban'];
+        if ($tab === 'bank' || $request->hasAny($bankFields)) {
+            abort_unless($request->user()->can('settings.edit'), 403);
+        }
+
         $inputs = $request->except(['_token', '_tab']);
 
         // Handle image uploads

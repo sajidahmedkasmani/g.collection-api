@@ -51,54 +51,81 @@ use App\Http\Controllers\CustomerProfileController;
 
 // ===== CMS ADMIN PANEL =====
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('products/import', [ProductController::class, 'importForm'])->name('products.import.form');
-    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
-    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
-    Route::resource('products', ProductController::class);
-    Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
-    Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.status');
-    Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
-    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard')->middleware('can:admin.dashboard');
+
+    Route::middleware('can:products.view')->group(function () {
+        Route::get('products', [ProductController::class, 'index'])->name('products.index');
+    });
+    Route::middleware('can:products.create')->group(function () {
+        Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+        Route::post('products', [ProductController::class, 'store'])->name('products.store');
+        Route::get('products/import', [ProductController::class, 'importForm'])->name('products.import.form');
+        Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
+    });
+    Route::middleware('can:products.edit')->group(function () {
+        Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+        Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::patch('products/{product}', [ProductController::class, 'update']);
+    });
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])
+        ->middleware('can:products.delete')->name('products.destroy');
+    Route::delete('products/bulk-delete', [ProductController::class, 'bulkDelete'])
+        ->middleware('can:products.bulk-delete')->name('products.bulk-delete');
+    Route::post('products/bulk-status', [ProductController::class, 'bulkStatus'])
+        ->middleware('can:products.bulk-status')->name('products.bulk-status');
+
+    Route::middleware('can:orders.view')->group(function () {
+        Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    });
+    Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])
+        ->middleware('can:orders.edit')->name('orders.status');
+
+    Route::get('settings', [SettingController::class, 'edit'])
+        ->middleware('can:settings.view')->name('settings.edit');
+    Route::post('settings', [SettingController::class, 'update'])
+        ->middleware('can:settings.edit')->name('settings.update');
 
     // Website CMS & Content
-    Route::get('cms', [CmsController::class, 'index'])->name('cms.index');
-    Route::post('cms', [CmsController::class, 'update'])->name('cms.update');
+    Route::get('cms', [CmsController::class, 'index'])
+        ->middleware('can:cms.view')->name('cms.index');
+    Route::post('cms', [CmsController::class, 'update'])
+        ->middleware('can:cms.edit')->name('cms.update');
 
     // FAQs CMS
-    Route::resource('faqs', FaqController::class);
-    Route::post('faqs/{faq}/toggle-active', [FaqController::class, 'toggleActive'])->name('faqs.toggle-active');
-
+    Route::get('faqs', [FaqController::class, 'index'])->middleware('can:faqs.view')->name('faqs.index');
+    Route::get('faqs/create', [FaqController::class, 'create'])->middleware('can:faqs.create')->name('faqs.create');
+    Route::post('faqs', [FaqController::class, 'store'])->middleware('can:faqs.create')->name('faqs.store');
+    Route::get('faqs/{faq}/edit', [FaqController::class, 'edit'])->middleware('can:faqs.edit')->name('faqs.edit');
+    Route::put('faqs/{faq}', [FaqController::class, 'update'])->middleware('can:faqs.edit')->name('faqs.update');
+    Route::patch('faqs/{faq}', [FaqController::class, 'update'])->middleware('can:faqs.edit');
+    Route::delete('faqs/{faq}', [FaqController::class, 'destroy'])->middleware('can:faqs.delete')->name('faqs.destroy');
+    Route::post('faqs/{faq}/toggle-active', [FaqController::class, 'toggleActive'])
+        ->middleware('can:faqs.edit')->name('faqs.toggle-active');
 
     // Sliders
-    Route::controller(SliderController::class)->group(function() {
-        Route::get('sliders', 'index')->name('sliders.index');
-        Route::get('sliders/create', 'create')->name('sliders.create');
-        Route::post('sliders', 'store')->name('sliders.store');
-        Route::get('sliders/{slider}/edit', 'edit')->name('sliders.edit');
-        Route::put('sliders/{slider}', 'update')->name('sliders.update');
-        Route::delete('sliders/{slider}', 'destroy')->name('sliders.destroy');
-        Route::post('sliders/reorder', 'reorder')->name('sliders.reorder');
-    });
+    Route::get('sliders', [SliderController::class, 'index'])->middleware('can:sliders.view')->name('sliders.index');
+    Route::get('sliders/create', [SliderController::class, 'create'])->middleware('can:sliders.create')->name('sliders.create');
+    Route::post('sliders', [SliderController::class, 'store'])->middleware('can:sliders.create')->name('sliders.store');
+    Route::get('sliders/{slider}/edit', [SliderController::class, 'edit'])->middleware('can:sliders.edit')->name('sliders.edit');
+    Route::put('sliders/{slider}', [SliderController::class, 'update'])->middleware('can:sliders.edit')->name('sliders.update');
+    Route::delete('sliders/{slider}', [SliderController::class, 'destroy'])->middleware('can:sliders.delete')->name('sliders.destroy');
+    Route::post('sliders/reorder', [SliderController::class, 'reorder'])->middleware('can:sliders.edit')->name('sliders.reorder');
 
-
-    // Bulk actions
-    Route::post('/products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete');
-    Route::post('/products/bulk-status', [ProductController::class, 'bulkStatus'])->name('products.bulk-status');
-  
-    
-    Route::get('/users', [UserController::class, 'index'])->name('users.index')->middleware('can:users.view');
-    Route::get('/users/create', [UserController::class, 'create'])->name('users.create')->middleware('can:users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store')->middleware('can:users.create');
-    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit')->middleware('can:users.edit');
-    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update')->middleware('can:users.edit');
-    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy')->middleware('can:users.delete');
+    Route::get('users', [UserController::class, 'index'])->middleware('can:users.view')->name('users.index');
+    Route::get('users/create', [UserController::class, 'create'])->middleware('can:users.create')->name('users.create');
+    Route::post('users', [UserController::class, 'store'])->middleware('can:users.create')->name('users.store');
+    Route::get('users/{user}/edit', [UserController::class, 'edit'])->middleware('can:users.edit')->name('users.edit');
+    Route::put('users/{user}', [UserController::class, 'update'])->middleware('can:users.edit')->name('users.update');
+    Route::delete('users/{user}', [UserController::class, 'destroy'])->middleware('can:users.delete')->name('users.destroy');
     Route::post('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])
         ->name('users.toggle-active')->middleware('can:users.toggle-active');
 
 
-    Route::get('/queue-monitor', [App\Http\Controllers\Admin\QueueMonitorController::class, 'index'])->name('queue.monitor');
-    Route::post('/queue-monitor/retry', [App\Http\Controllers\Admin\QueueMonitorController::class, 'retryFailed'])->name('queue.retry');
+    Route::get('queue-monitor', [App\Http\Controllers\Admin\QueueMonitorController::class, 'index'])
+        ->middleware('can:queue.view')->name('queue.monitor');
+    Route::post('queue-monitor/retry', [App\Http\Controllers\Admin\QueueMonitorController::class, 'retryFailed'])
+        ->middleware('can:queue.view')->name('queue.retry');
 
 
 });

@@ -4,7 +4,9 @@
 @section('content')
 <div class="flex items-center justify-between mb-4">
     <p class="text-sm text-gray-500">Hero sliders for homepage. Drag to reorder.</p>
+    @can('sliders.create')
     <a href="{{ route('admin.sliders.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Slider</a>
+    @endcan
 </div>
 
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -44,11 +46,15 @@
                     </td>
                     <td class="text-xs text-gray-500">{{ $s->sort_order }}</td>
                     <td class="space-x-3">
+                        @can('sliders.edit')
                         <a href="{{ route('admin.sliders.edit', $s) }}" class="text-blue-600 hover:underline">Edit</a>
+                        @endcan
+                        @can('sliders.delete')
                         <form action="{{ route('admin.sliders.destroy', $s) }}" method="POST" class="inline" onsubmit="return confirm('Delete this slider?')">
                             @csrf @method('DELETE')
                             <button class="text-red-600 hover:underline">Delete</button>
                         </form>
+                        @endcan
                     </td>
                 </tr>
             @empty

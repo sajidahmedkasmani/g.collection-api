@@ -27,8 +27,10 @@
             @endif
         </form>
         <div class="flex gap-2">
+            @can('products.create')
             <a href="{{ route('admin.products.import.form') }}" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">Import CSV</a>
             <a href="{{ route('admin.products.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">+ Add Product</a>
+            @endcan
         </div>
     </div>
 
@@ -41,6 +43,7 @@
     @endif
 
     {{-- Bulk actions bar (visible only when selection > 0) --}}
+    @canany(['products.bulk-status', 'products.bulk-delete'])
     <div x-show="selected.length > 0" x-cloak
          class="flex items-center gap-3 bg-gray-50 border rounded-xl px-4 py-3">
         <span class="text-sm text-gray-600">
@@ -48,6 +51,7 @@
         </span>
 
         {{-- Bulk status update --}}
+        @can('products.bulk-status')
         <form method="POST" action="{{ route('admin.products.bulk-status') }}" class="inline">
             @csrf
             <template x-for="id in selected" :key="'s'+id">
@@ -69,8 +73,10 @@
                 Deactivate
             </button>
         </form>
+        @endcan
 
         {{-- Bulk delete --}}
+        @can('products.bulk-delete')
         <form method="POST" action="{{ route('admin.products.bulk-delete') }}" class="inline"
               onsubmit="return confirm('Delete selected products? This cannot be undone.')">
             @csrf
@@ -82,11 +88,13 @@
                 Delete
             </button>
         </form>
+        @endcan
 
         <button type="button" @click="selected = []" class="text-xs text-gray-500 hover:underline ml-auto">
             Clear selection
         </button>
     </div>
+    @endcanany
 
     {{-- Products table --}}
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -111,10 +119,12 @@
                 @forelse($products as $p)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="py-3 px-4">
+                            @canany(['products.bulk-status', 'products.bulk-delete'])
                             <input type="checkbox"
                                    value="{{ $p->id }}"
                                    x-model.number="selected"
                                    class="rounded border-gray-300">
+                            @endcanany
                         </td>
                         <td class="py-3 px-4">
                             @if($p->image)
@@ -135,12 +145,16 @@
                             @endif
                         </td>
                         <td>
+                            @can('products.edit')
                             <a href="{{ route('admin.products.edit', $p) }}" class="text-blue-600 hover:underline mr-3">Edit</a>
+                            @endcan
+                            @can('products.delete')
                             <form action="{{ route('admin.products.destroy', $p) }}" method="POST" class="inline"
                                   onsubmit="return confirm('Delete this product?')">
                                 @csrf @method('DELETE')
                                 <button class="text-red-600 hover:underline">Delete</button>
                             </form>
+                            @endcan
                         </td>
                     </tr>
                 @empty

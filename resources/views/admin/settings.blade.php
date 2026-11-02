@@ -28,7 +28,9 @@
                 <input type="text" name="whatsapp_number" value="{{ old('whatsapp_number', $settings['whatsapp_number'] ?? '') }}" class="w-full border rounded-lg px-3 py-2 mt-1">
             </div>
         </div>
+        @can('settings.edit')
         <button class="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm">Save Settings</button>
+        @endcan
     </form>
 </div>
 @endsection
