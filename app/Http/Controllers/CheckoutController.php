@@ -21,7 +21,7 @@ class CheckoutController extends Controller
             return redirect()->route('shop')->with('error', 'Your cart is empty.');
         }
         $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-        return view('shop.checkout', compact('cart', 'total'));
+        return view('frontend.shop.checkout', compact('cart', 'total'));
     }
 
     public function store(Request $request)
@@ -124,6 +124,6 @@ class CheckoutController extends Controller
     public function success($orderNumber)
     {
         $order = Order::with('items')->where('order_number', $orderNumber)->firstOrFail();
-        return view('shop.success', compact('order'));
+        return view('frontend.shop.success', compact('order'));
     }
 }
