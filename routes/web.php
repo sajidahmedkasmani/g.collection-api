@@ -67,10 +67,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::patch('products/{product}', [ProductController::class, 'update']);
     });
-    Route::delete('products/{product}', [ProductController::class, 'destroy'])
-        ->middleware('can:products.delete')->name('products.destroy');
     Route::delete('products/bulk-delete', [ProductController::class, 'bulkDelete'])
         ->middleware('can:products.bulk-delete')->name('products.bulk-delete');
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])
+        ->middleware('can:products.delete')->name('products.destroy');
     Route::post('products/bulk-status', [ProductController::class, 'bulkStatus'])
         ->middleware('can:products.bulk-status')->name('products.bulk-status');
 
@@ -125,7 +125,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('queue-monitor', [App\Http\Controllers\Admin\QueueMonitorController::class, 'index'])
         ->middleware('can:queue.view')->name('queue.monitor');
     Route::post('queue-monitor/retry', [App\Http\Controllers\Admin\QueueMonitorController::class, 'retryFailed'])
-        ->middleware('can:queue.view')->name('queue.retry');
+        ->middleware('can:queue.retry')->name('queue.retry');
 
 
 });

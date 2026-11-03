@@ -22,10 +22,12 @@
             <h3 class="text-gray-500 text-sm font-medium">Failed Emails</h3>
             <p class="text-3xl font-bold text-red-600">{{ $failedJobs }}</p>
             @if($failedJobs > 0)
+                @can('queue.retry')
                 <form action="{{ route('admin.queue.retry') }}" method="POST" class="mt-2">
                     @csrf
                     <button class="bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-red-700">Retry All</button>
                 </form>
+                @endcan
             @endif
         </div>
     </div>

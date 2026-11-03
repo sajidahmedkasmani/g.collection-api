@@ -53,6 +53,7 @@ class PermissionSeeder extends Seeder
 
             // Queue Monitor
             ['name' => 'queue.view',           'label' => 'View Queue Monitor',     'module' => 'Queue Monitor'],
+            ['name' => 'queue.retry',          'label' => 'Retry Failed Jobs',      'module' => 'Queue Monitor'],
         ];
 
         foreach ($permissions as $p) {
