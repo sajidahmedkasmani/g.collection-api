@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class CustomerProfileController extends Controller
 {
@@ -19,11 +21,17 @@ class CustomerProfileController extends Controller
 
         $data = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'unique:customers,email,' . $customer->id],
+            'email'    => ['required', 'email', Rule::unique('customers', 'email')
+                ->where(fn ($query) => $query->where('is_deleted', false))
+                ->ignore($customer->id)],
             'phone'    => ['required', 'string', 'max:20'],
             'city'     => ['nullable', 'string', 'max:100'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
+
+        Order::whereNull('customer_id')
+            ->where('email', $customer->email)
+            ->update(['customer_id' => $customer->id]);
 
         $customer->fill([
             'name'  => $data['name'],

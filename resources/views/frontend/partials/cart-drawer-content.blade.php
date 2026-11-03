@@ -43,12 +43,14 @@
                     </div>
                     <p class="text-sm text-muted mt-0.5">Rs. {{ number_format($item['price']) }}</p>
                     <div class="mt-auto flex items-center justify-between">
-                        <form action="{{ route('cart.update') }}" method="POST" class="inline-flex items-center border border-black/15 rounded-full">
+                        <form action="{{ route('cart.update') }}" method="POST" class="inline-flex items-center border border-black/15 rounded-full" aria-label="Update {{ $item['name'] }} quantity">
                             @csrf
                             <input type="hidden" name="product_id" value="{{ $id }}">
-                            <button name="quantity" value="{{ max(1, $quantity - 1) }}" @disabled($quantity <= 1) aria-label="Decrease quantity" class="w-8 h-8 flex items-center justify-center disabled:opacity-30">−</button>
-                            <span class="w-6 text-center text-sm">{{ $quantity }}</span>
-                            <button name="quantity" value="{{ min(99, $quantity + 1) }}" @disabled($quantity >= 99) aria-label="Increase quantity" class="w-8 h-8 flex items-center justify-center">+</button>
+                            <button type="button" data-quantity-step="-1" @disabled($quantity <= 1) aria-label="Decrease quantity" class="w-8 h-8 flex items-center justify-center disabled:opacity-30">−</button>
+                            <input type="number" name="quantity" value="{{ $quantity }}" min="1" max="99" required inputmode="numeric"
+                                   data-cart-quantity aria-label="Quantity for {{ $item['name'] }}"
+                                   class="w-10 text-center text-sm border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-plum rounded">
+                            <button type="button" data-quantity-step="1" @disabled($quantity >= 99) aria-label="Increase quantity" class="w-8 h-8 flex items-center justify-center">+</button>
                         </form>
                         <p class="text-sm font-semibold">Rs. {{ number_format($item['price'] * $quantity) }}</p>
                     </div>

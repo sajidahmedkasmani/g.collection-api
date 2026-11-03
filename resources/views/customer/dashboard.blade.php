@@ -4,8 +4,12 @@
 @section('content')
 @php
     $cust       = auth('customer')->user();
-    $orders     = \App\Models\Order::where('customer_id', $cust->id)->latest()->take(5)->get();
-    $orderCount = \App\Models\Order::where('customer_id', $cust->id)->count();
+    $ordersQuery = \App\Models\Order::where(function ($query) use ($cust) {
+        $query->where('customer_id', $cust->id)
+            ->orWhere('email', $cust->email);
+    });
+    $orders     = (clone $ordersQuery)->latest()->take(5)->get();
+    $orderCount = $ordersQuery->count();
     $pill = [
         'pending'    => 'bg-amber-50 text-amber-800',
         'processing' => 'bg-blue-50 text-blue-800',

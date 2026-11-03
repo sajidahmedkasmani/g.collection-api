@@ -530,7 +530,25 @@
                 }
             });
 
+            document.addEventListener('change', (event) => {
+                if (event.target.matches('[data-cart-quantity]')) {
+                    event.target.form.requestSubmit();
+                }
+            });
+
             document.addEventListener('click', async (event) => {
+                const quantityStep = event.target.closest('[data-quantity-step]');
+                if (quantityStep) {
+                    const form = quantityStep.form;
+                    const quantity = form.querySelector('[data-cart-quantity]');
+                    quantity.value = Math.max(
+                        Number(quantity.min),
+                        Math.min(Number(quantity.max), Number(quantity.value) + Number(quantityStep.dataset.quantityStep))
+                    );
+                    form.requestSubmit();
+                    return;
+                }
+
                 const closeButton = event.target.closest('[data-close-cart]');
                 if (closeButton) {
                     closeCart();

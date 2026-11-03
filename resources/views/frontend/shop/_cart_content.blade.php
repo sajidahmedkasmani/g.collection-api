@@ -36,13 +36,15 @@
                                         </form>
                                     </div>
                                     <div class="mt-auto pt-4 flex items-center justify-between">
-                                        <form action="{{ route('cart.update') }}" method="POST" class="inline-flex items-center border border-black/15 rounded-full bg-white">
+                                        <form action="{{ route('cart.update') }}" method="POST" class="inline-flex items-center border border-black/15 rounded-full bg-white" aria-label="Update {{ $item['name'] }} quantity">
                                             @csrf
                                             <input type="hidden" name="product_id" value="{{ $id }}">
-                                            <button name="quantity" value="{{ max(1, $quantity - 1) }}" @disabled($quantity <= 1) aria-label="Decrease quantity"
+                                            <button type="button" data-quantity-step="-1" @disabled($quantity <= 1) aria-label="Decrease quantity"
                                                     class="w-10 h-10 flex items-center justify-center text-lg hover:text-rose disabled:opacity-30 disabled:hover:text-ink transition">−</button>
-                                            <span class="w-8 text-center text-sm font-medium" aria-live="polite">{{ $quantity }}</span>
-                                            <button name="quantity" value="{{ min(99, $quantity + 1) }}" @disabled($quantity >= 99) aria-label="Increase quantity"
+                                            <input type="number" name="quantity" value="{{ $quantity }}" min="1" max="99" required inputmode="numeric"
+                                                   data-cart-quantity aria-label="Quantity for {{ $item['name'] }}"
+                                                   class="w-12 text-center text-sm font-medium border-0 bg-transparent focus:outline-none focus:ring-1 focus:ring-plum rounded">
+                                            <button type="button" data-quantity-step="1" @disabled($quantity >= 99) aria-label="Increase quantity"
                                                     class="w-10 h-10 flex items-center justify-center text-lg hover:text-rose transition">+</button>
                                         </form>
                                         <p class="font-semibold">Rs. {{ number_format($item['price'] * $quantity) }}</p>
