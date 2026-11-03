@@ -231,6 +231,12 @@ class ShopController extends Controller
             ->values();
         }
     // Blogs
+
+    public function faqs()
+    {
+        $products = Product::where('is_active', true)->latest()->paginate(12);
+        return view('frontend.faqs', compact('products'));
+    }
     
 
 

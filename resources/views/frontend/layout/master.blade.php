@@ -94,29 +94,30 @@
       @keydown.escape.window="menu=false; cart=false; acc=false"
       :class="(menu || cart) ? 'overflow-hidden' : ''">
 
-@php
-    $gcCart  = session('cart', []);
-    $gcSummary = \App\Support\CartSummary::for($gcCart);
-    $gcCount = $gcSummary['item_count'];
-    $customer = auth('customer')->user();
-    $gcNav = [
-        ['Home', 'home'],
-        ['About Us', 'aboutus'],
-        ['Shop', 'shop'],
-        ['Blogs', 'blogs'],
-        ['Contact', 'contact'],
-    ];
-    $gcCats = ['stitched' => 'Stitched', 'unstitched' => 'Unstitched', 'accessories' => 'Accessories'];
-    $gcSkipDrawer = request()->routeIs('cart.*', 'checkout.*');
-    $userSvg = '<svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
-@endphp
+    @php
+        $gcCart  = session('cart', []);
+        $gcSummary = \App\Support\CartSummary::for($gcCart);
+        $gcCount = $gcSummary['item_count'];
+        $customer = auth('customer')->user();
+        $gcNav = [
+            ['Home', 'home'],
+            ['About Us', 'aboutus'],
+            ['Shop', 'shop'],
+            ['Blogs', 'blogs'],
+            ['Contact', 'contact'],
+        ];
+        $gcCats = ['stitched' => 'Stitched', 'unstitched' => 'Unstitched', 'accessories' => 'Accessories'];
+        $gcSkipDrawer = request()->routeIs('cart.*', 'checkout.*');
+        $userSvg = '<svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    @endphp
 
     <!-- ANNOUNCEMENT BAR -->
-    @if(setting('announcement_enabled', '1') == '1' && setting('announcement_text'))
-    <div class="bg-plum text-cream text-[11px] tracking-[0.2em] uppercase text-center py-2 px-4">
-        {{ setting('announcement_text', 'Free shipping on orders above Rs. 10,000') }}
-    </div>
-    @endif
+        @if(setting('announcement_enabled', '1') == '1' && setting('announcement_text'))
+            <div class="bg-plum text-cream text-[11px] tracking-[0.2em] uppercase text-center py-2 px-4">
+                {{ setting('announcement_text', 'Free shipping on orders above Rs. 10,000') }}
+            </div>
+        @endif
+    <!-- ANNOUNCEMENT BAR -->
 
     <!-- HEADER -->
     <header class="bg-cream/95 backdrop-blur border-b border-black/10 sticky top-0 z-50">
@@ -203,111 +204,111 @@
     </header>
 
     @unless($gcSkipDrawer)
-    <!-- MOBILE BOTTOM BAR -->
-    <nav class="md:hidden fixed bottom-0 inset-x-0 z-[55] bg-cream/95 backdrop-blur border-t border-black/10"
-         style="padding-bottom: env(safe-area-inset-bottom)" aria-label="Quick navigation">
-        <ul class="grid grid-cols-5 text-[11px]">
-            <li>
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('home') ? 'text-plum font-medium' : 'text-ink/60' }}">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></svg>
-                    Home
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('shop') }}" class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('shop') ? 'text-plum font-medium' : 'text-ink/60' }}">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>
-                    Shop
-                </a>
-            </li>
-            <li>
-                <button type="button" @click="cart = true; menu = false" class="w-full flex flex-col items-center gap-1 py-2.5 text-ink/60" aria-label="Open cart, {{ $gcCount }} items">
-                    <span class="relative">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
-                        @if($gcCount > 0)
-                            <span class="absolute -top-1.5 -right-2.5 bg-rose text-white text-[10px] font-medium rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{{ $gcCount }}</span>
-                        @endif
-                    </span>
-                    Cart
-                </button>
-            </li>
-            <li>
-                <a href="{{ $customer ? route('customer.dashboard') : route('customer.login') }}"
-                   class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('customer.*') ? 'text-plum font-medium' : 'text-ink/60' }}">
-                    {!! str_replace('w-[22px] h-[22px]', 'w-6 h-6', $userSvg) !!}
-                    {{ $customer ? 'Account' : 'Log in' }}
-                </a>
-            </li>
-            <li>
-                <button type="button" @click="menu = true; cart = false" class="w-full flex flex-col items-center gap-1 py-2.5 text-ink/60" aria-haspopup="dialog" :aria-expanded="menu">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
-                    Menu
-                </button>
-            </li>
-        </ul>
-    </nav>
-
-    <!-- MOBILE MENU SHEET (slides up from the bottom, same links as desktop) -->
-    <div class="md:hidden fixed inset-0 z-[60]" :class="menu ? '' : 'pointer-events-none'">
-        <div x-cloak x-show="menu" x-transition.opacity.duration.250ms class="absolute inset-0 bg-ink/40 backdrop-blur-sm" @click="menu = false"></div>
-
-        <div x-cloak x-show="menu"
-             x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
-             x-transition:leave="transition duration-200 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
-             class="absolute inset-x-0 bottom-0 max-h-[88%] overflow-y-auto bg-cream rounded-t-3xl shadow-[0_-20px_50px_-20px_rgba(31,18,21,.35)] px-5 pt-3"
-             style="padding-bottom: max(1.5rem, env(safe-area-inset-bottom))"
-             role="dialog" aria-modal="true" aria-label="Menu">
-
-            <div class="mx-auto w-10 h-1 rounded-full bg-black/15 mb-3"></div>
-            <div class="flex items-center justify-between mb-1">
-                <p class="font-serif text-2xl">Menu</p>
-                <button type="button" @click="menu = false" aria-label="Close menu" class="p-1 -mr-1">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
-                </button>
-            </div>
-
-            <nav aria-label="Mobile">
-                @foreach($gcNav as [$label, $name])
-                    <a href="{{ route($name) }}" class="flex items-center justify-between py-3.5 border-b border-black/10 text-lg {{ request()->routeIs($name) ? 'text-rose font-medium' : '' }}">
-                        {{ $label }}
-                        <svg class="w-5 h-5 text-black/30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        <!-- MOBILE BOTTOM BAR -->
+        <nav class="md:hidden fixed bottom-0 inset-x-0 z-[55] bg-cream/95 backdrop-blur border-t border-black/10"
+            style="padding-bottom: env(safe-area-inset-bottom)" aria-label="Quick navigation">
+            <ul class="grid grid-cols-5 text-[11px]">
+                <li>
+                    <a href="{{ route('home') }}" class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('home') ? 'text-plum font-medium' : 'text-ink/60' }}">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></svg>
+                        Home
                     </a>
-                @endforeach
-            </nav>
+                </li>
+                <li>
+                    <a href="{{ route('shop') }}" class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('shop') ? 'text-plum font-medium' : 'text-ink/60' }}">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1"/></svg>
+                        Shop
+                    </a>
+                </li>
+                <li>
+                    <button type="button" @click="cart = true; menu = false" class="w-full flex flex-col items-center gap-1 py-2.5 text-ink/60" aria-label="Open cart, {{ $gcCount }} items">
+                        <span class="relative">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+                            @if($gcCount > 0)
+                                <span class="absolute -top-1.5 -right-2.5 bg-rose text-white text-[10px] font-medium rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{{ $gcCount }}</span>
+                            @endif
+                        </span>
+                        Cart
+                    </button>
+                </li>
+                <li>
+                    <a href="{{ $customer ? route('customer.dashboard') : route('customer.login') }}"
+                    class="flex flex-col items-center gap-1 py-2.5 {{ request()->routeIs('customer.*') ? 'text-plum font-medium' : 'text-ink/60' }}">
+                        {!! str_replace('w-[22px] h-[22px]', 'w-6 h-6', $userSvg) !!}
+                        {{ $customer ? 'Account' : 'Log in' }}
+                    </a>
+                </li>
+                <li>
+                    <button type="button" @click="menu = true; cart = false" class="w-full flex flex-col items-center gap-1 py-2.5 text-ink/60" aria-haspopup="dialog" :aria-expanded="menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+                        Menu
+                    </button>
+                </li>
+            </ul>
+        </nav>
 
-            <div class="flex flex-wrap gap-2 py-4">
-                @foreach($gcCats as $slug => $catLabel)
-                    <a href="{{ route('shop') }}?category={{ $slug }}" class="px-4 py-2 rounded-full border border-black/15 text-sm hover:border-plum hover:text-plum transition">{{ $catLabel }}</a>
-                @endforeach
-            </div>
+        <!-- MOBILE MENU SHEET (slides up from the bottom, same links as desktop) -->
+        <div class="md:hidden fixed inset-0 z-[60]" :class="menu ? '' : 'pointer-events-none'">
+            <div x-cloak x-show="menu" x-transition.opacity.duration.250ms class="absolute inset-0 bg-ink/40 backdrop-blur-sm" @click="menu = false"></div>
 
-            @if($customer)
-                <div class="flex items-center gap-4 p-4 rounded-2xl bg-blush/50">
-                    <div class="w-11 h-14 arch bg-plum text-cream font-serif text-lg flex items-end justify-center pb-1 shrink-0">{{ mb_strtoupper(mb_substr($customer->name, 0, 1)) }}</div>
-                    <div class="min-w-0">
-                        <p class="font-serif text-lg leading-tight truncate">{{ $customer->name }}</p>
-                        <p class="text-xs text-muted truncate">{{ $customer->email }}</p>
+            <div x-cloak x-show="menu"
+                x-transition:enter="transition duration-300 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+                x-transition:leave="transition duration-200 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
+                class="absolute inset-x-0 bottom-0 max-h-[88%] overflow-y-auto bg-cream rounded-t-3xl shadow-[0_-20px_50px_-20px_rgba(31,18,21,.35)] px-5 pt-3"
+                style="padding-bottom: max(1.5rem, env(safe-area-inset-bottom))"
+                role="dialog" aria-modal="true" aria-label="Menu">
+
+                <div class="mx-auto w-10 h-1 rounded-full bg-black/15 mb-3"></div>
+                <div class="flex items-center justify-between mb-1">
+                    <p class="font-serif text-2xl">Menu</p>
+                    <button type="button" @click="menu = false" aria-label="Close menu" class="p-1 -mr-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                    </button>
+                </div>
+
+                <nav aria-label="Mobile">
+                    @foreach($gcNav as [$label, $name])
+                        <a href="{{ route($name) }}" class="flex items-center justify-between py-3.5 border-b border-black/10 text-lg {{ request()->routeIs($name) ? 'text-rose font-medium' : '' }}">
+                            {{ $label }}
+                            <svg class="w-5 h-5 text-black/30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+                        </a>
+                    @endforeach
+                </nav>
+
+                <div class="flex flex-wrap gap-2 py-4">
+                    @foreach($gcCats as $slug => $catLabel)
+                        <a href="{{ route('shop') }}?category={{ $slug }}" class="px-4 py-2 rounded-full border border-black/15 text-sm hover:border-plum hover:text-plum transition">{{ $catLabel }}</a>
+                    @endforeach
+                </div>
+
+                @if($customer)
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-blush/50">
+                        <div class="w-11 h-14 arch bg-plum text-cream font-serif text-lg flex items-end justify-center pb-1 shrink-0">{{ mb_strtoupper(mb_substr($customer->name, 0, 1)) }}</div>
+                        <div class="min-w-0">
+                            <p class="font-serif text-lg leading-tight truncate">{{ $customer->name }}</p>
+                            <p class="text-xs text-muted truncate">{{ $customer->email }}</p>
+                        </div>
                     </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3 mt-3 text-sm">
-                    <a href="{{ route('customer.dashboard') }}" class="text-center py-3 rounded-xl border border-black/15">My account</a>
-                    <form method="POST" action="{{ route('customer.logout') }}">
-                        @csrf
-                        <button class="w-full py-3 rounded-xl border border-black/15 text-muted">Log out</button>
-                    </form>
-                </div>
-            @else
-                <div class="grid grid-cols-2 gap-3 text-sm">
-                    <a href="{{ route('customer.login') }}" class="text-center py-3.5 rounded-xl bg-plum text-cream font-medium">Log in</a>
-                    <a href="{{ route('customer.register') }}" class="text-center py-3.5 rounded-xl border border-black/15">Create account</a>
-                </div>
-            @endif
+                    <div class="grid grid-cols-2 gap-3 mt-3 text-sm">
+                        <a href="{{ route('customer.dashboard') }}" class="text-center py-3 rounded-xl border border-black/15">My account</a>
+                        <form method="POST" action="{{ route('customer.logout') }}">
+                            @csrf
+                            <button class="w-full py-3 rounded-xl border border-black/15 text-muted">Log out</button>
+                        </form>
+                    </div>
+                @else
+                    <div class="grid grid-cols-2 gap-3 text-sm">
+                        <a href="{{ route('customer.login') }}" class="text-center py-3.5 rounded-xl bg-plum text-cream font-medium">Log in</a>
+                        <a href="{{ route('customer.register') }}" class="text-center py-3.5 rounded-xl border border-black/15">Create account</a>
+                    </div>
+                @endif
 
-            <div class="pt-5 text-sm text-muted">
-                <a href="https://wa.me/923347779231" class="text-ink font-medium">WhatsApp +92 334 7779231</a>
-                <p>Mon–Sat, 11:00 AM – 9:00 PM</p>
+                <div class="pt-5 text-sm text-muted">
+                    <a href="https://wa.me/923347779231" class="text-ink font-medium">WhatsApp +92 334 7779231</a>
+                    <p>Mon–Sat, 11:00 AM – 9:00 PM</p>
+                </div>
             </div>
         </div>
-    </div>
     @endunless
 
     <!-- CART DRAWER -->
@@ -346,7 +347,7 @@
 
     <!-- FOOTER -->
     <footer class="bg-ink text-cream {{ $gcSkipDrawer ? '' : 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' }}">
-        <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-4 gap-10">
+        <div class="max-w-7xl mx-auto px-6 py-16 grid grid-cols-2 md:grid-cols-5 gap-10">
             <div class="col-span-2 md:col-span-1">
                 <p class="font-serif text-3xl mb-3">{{ setting('site_name', 'G. Collection') }}</p>
                 <p class="text-sm text-cream/60 leading-relaxed max-w-xs">{{ setting('footer_about', "A full collection of stitched and unstitched ladies' clothing from Karachi, Pakistan.") }}</p>
@@ -370,33 +371,53 @@
                     </div>
                 @endif
             </div>
-            <div>
-                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Shop</p>
-                <ul class="space-y-2 text-sm text-cream/80">
-                    <li><a href="{{ route('shop') }}" class="hover:text-rose">All products</a></li>
-                    @foreach($gcCats as $slug => $catLabel)
-                        <li><a href="{{ route('shop') }}?category={{ $slug }}" class="hover:text-rose">{{ $catLabel }}</a></li>
-                    @endforeach
-                </ul>
-            </div>
-            <div>
-                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Customer support</p>
-                <ul class="space-y-2 text-sm text-cream/80">
-                    <li><a href="{{ whatsapp_link() }}" target="_blank" rel="noopener" class="hover:text-rose">Contact us</a></li>
-                    <li><a href="{{ route('home') }}#faq" class="hover:text-rose">FAQ</a></li>
-                    <li><a href="{{ route('aboutus') }}" class="hover:text-rose">About Us</a></li>
-                    <li><a href="{{ route('contact') }}" class="hover:text-rose">Returns &amp; exchanges</a></li>
-                </ul>
-            </div>
-            <div>
-                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Contact</p>
-                <ul class="space-y-2 text-sm text-cream/80">
-                    <li>{{ setting('contact_address', 'Karachi, Pakistan') }}</li>
-                    <li>{{ setting('contact_hours', 'Mon–Sat, 11:00 AM – 9:00 PM') }}</li>
-                    <li><a href="{{ whatsapp_link() }}" target="_blank" rel="noopener" class="hover:text-rose">WhatsApp {{ setting('contact_phone', '+92 334 7779231') }}</a></li>
-                    <li><a href="mailto:{{ setting('contact_email', 'support@gdotcollection.com') }}" class="hover:text-rose">{{ setting('contact_email', 'support@gdotcollection.com') }}</a></li>
-                </ul>
-            </div>
+            <!-- Shop -->
+                <div>
+                    <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Shop</p>
+                    <ul class="space-y-2 text-sm text-cream/80">
+                        <li><a href="{{ route('shop') }}" class="hover:text-rose">All products</a></li>
+                        @foreach($gcCats as $slug => $catLabel)
+                            <li><a href="{{ route('shop') }}?category={{ $slug }}" class="hover:text-rose">{{ $catLabel }}</a></li>
+                        @endforeach
+                    </ul>
+                </div>
+            <!-- Shop -->
+
+            <!-- Customer Support -->
+                <div>
+                    <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Customer support</p>
+                    <ul class="space-y-2 text-sm text-cream/80">
+                        <li><a href="{{ route('contact') }}" class="hover:text-rose">Contact us</a></li>
+                        <li><a href="{{ route('faqs') }}" class="hover:text-rose">FAQs</a></li>
+                        <li><a href="{{ route('shipping') }}" class="hover:text-rose">Shipping information</a></li>
+                        <li><a href="{{ route('returns') }}" class="hover:text-rose">Returns &amp; exchanges</a></li>
+                    </ul>
+                </div>
+            <!-- Customer Support -->
+
+            <!-- Policies -->
+                <div>
+                    <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Policies</p>
+                    <ul class="space-y-2 text-sm text-cream/80">
+                        <li><a href="{{ route('shipping') }}" class="hover:text-rose">Shipping Policy</a></li>
+                        <li><a href="{{ route('returns') }}" class="hover:text-rose">Returns & Exchanges</a></li>
+                        <li><a href="{{ route('privacy') }}" class="hover:text-rose">Privacy Policy</a></li>
+                        <li><a href="{{ route('terms') }}" class="hover:text-rose">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            <!-- Policies -->
+
+            <!-- Contact -->
+                <div>
+                    <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Contact</p>
+                    <ul class="space-y-2 text-sm text-cream/80">
+                        <li>{{ setting('contact_address', 'Karachi, Pakistan') }}</li>
+                        <li>{{ setting('contact_hours', 'Mon–Sat, 11:00 AM – 9:00 PM') }}</li>
+                        <li><a href="{{ whatsapp_link() }}" target="_blank" rel="noopener" class="hover:text-rose">WhatsApp {{ setting('contact_phone', '+92 334 7779231') }}</a></li>
+                        <li><a href="mailto:{{ setting('contact_email', 'support@gdotcollection.com') }}" class="hover:text-rose">{{ setting('contact_email', 'support@gdotcollection.com') }}</a></li>
+                    </ul>
+                </div>
+            <!-- Contact -->
         </div>
         <div class="border-t border-cream/10 max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between gap-3 text-xs text-cream/50">
             <span>© {{ date('Y') }} {{ setting('copyright_text', 'G. Collection. All rights reserved.') }}</span>

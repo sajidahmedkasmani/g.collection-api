@@ -33,12 +33,21 @@ use App\Http\Controllers\CustomerProfileController;
 
         Route::get('/contact', 'contact')->name('contact');
         Route::post('/contact', 'send')->middleware('throttle:5,1')->name('contact.send');
+
+        Route::get('/faqs', 'faqs')->name('faqs');
+        
     });
 
-Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
-        ->middleware('throttle:5,1')->name('newsletter.subscribe');
-Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])
-        ->name('newsletter.unsubscribe');
+    // Other pages
+        Route::view('/shipping', 'frontend.shipping')->name('shipping');
+        Route::view('/returns',  'frontend.returns')->name('returns');
+        Route::view('/privacy',  'frontend.privacy')->name('privacy');
+        Route::view('/terms',    'frontend.terms')->name('terms');
+
+    Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
+            ->middleware('throttle:5,1')->name('newsletter.subscribe');
+    Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])
+            ->name('newsletter.unsubscribe');
 
     // ===== CART =====
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');

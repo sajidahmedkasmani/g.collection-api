@@ -1,0 +1,18 @@
+1. Reordering in FAQS & sliders
+2. remove duplicate things in cms and settings etc
+3. redesign view order page and add/edit product
+4. work on category and collection
+5. give filters of active/inactive in products
+6. have to integrate Postex API
+7. work on coupons and sale
+
+8. give option of signin with google to customer
+9. homepage mobile 
+10. pages (faqs, return, policy, shipping, etc)  done..
+11. Blogs
+12. email cron job on live server
+13. fix the search and work on wishlist
+
+
+LATER:- 4, 5, 6, 7, 8, 11   
+MAND:- 10, 12
