@@ -11,7 +11,7 @@ class CartController extends Controller
     {
         $cart = session()->get('cart', []);
         $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-        return view('shop.cart', compact('cart', 'total'));
+        return view('frontend.shop.cart', compact('cart', 'total'));
     }
 
     public function add(Request $request)
