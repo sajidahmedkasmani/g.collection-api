@@ -51,6 +51,8 @@
             </table>
 
             <div class="totals">
+                <p>Subtotal: Rs. {{ number_format(($order->subtotal_paisa ?? 0) / 100) }}</p>
+                <p>Shipping: {{ ($order->shipping_paisa ?? 0) > 0 ? 'Rs. '.number_format($order->shipping_paisa / 100) : 'Free' }}</p>
                 <p>Total: <strong>Rs. {{ number_format($order->total) }}</strong></p>
             </div>
 

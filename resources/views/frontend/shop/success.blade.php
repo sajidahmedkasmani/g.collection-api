@@ -35,6 +35,10 @@
                     <span>Rs. {{ number_format($item->price * $item->quantity) }}</span>
                 </div>
             @endforeach
+            <div class="flex justify-between border-t mt-3 pt-3 text-sm">
+                <span>Shipping</span>
+                <span>{{ ($order->shipping_paisa ?? 0) > 0 ? 'Rs. '.number_format($order->shipping_paisa / 100) : 'Free' }}</span>
+            </div>
         </div>
 
         {{-- Post-purchase account creation prompt (sirf guest ke liye) --}}

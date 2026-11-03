@@ -14,7 +14,7 @@ class AdminController extends Controller
         $canViewProducts = $user->can('products.view');
         $canViewOrders = $user->can('orders.view');
         $stats = [
-            'products' => $canViewProducts ? Product::count() : 0,
+            'products' => $canViewProducts ? Product::where('is_active', 1)->count() : 0,
             'orders' => $canViewOrders ? Order::count() : 0,
             'pending_orders' => $canViewOrders ? Order::where('status', 'pending')->count() : 0,
             'revenue' => $canViewOrders ? Order::where('status', 'completed')->sum('total') : 0,

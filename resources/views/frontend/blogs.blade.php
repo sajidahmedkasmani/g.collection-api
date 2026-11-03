@@ -72,10 +72,11 @@
 <section class="bg-blush">
     <div class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-10 items-center">
         <h2 class="font-serif text-4xl md:text-6xl leading-[1.02]">Never miss<br>a <span class="italic text-plum">new story.</span></h2>
-        <form onsubmit="event.preventDefault(); alert('Thanks! (newsletter backend later)');">
+        <form action="{{ route('newsletter.subscribe') }}" method="POST" data-newsletter-form>
+            @csrf
             <div class="flex border-b border-ink">
-                <input type="email" required placeholder="you@example.com" class="flex-1 bg-transparent py-4 text-lg focus:outline-none placeholder:text-black/30">
-                <button class="bg-ink text-white text-xs rounded-full px-6 my-2 hover:bg-plum transition">Subscribe</button>
+                <input type="email" name="email" autocomplete="email" required placeholder="you@example.com" class="flex-1 bg-transparent py-4 text-lg focus:outline-none placeholder:text-black/30">
+                <button type="submit" class="bg-ink text-white text-xs rounded-full px-6 my-2 hover:bg-plum transition">Subscribe</button>
             </div>
             <p class="text-xs text-ink/60 mt-3">Just your email, nothing else.</p>
         </form>

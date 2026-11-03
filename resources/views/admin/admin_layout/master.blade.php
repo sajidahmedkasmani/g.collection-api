@@ -177,6 +177,9 @@
                             @can('settings.view')
                             <a href="{{ route('admin.settings.edit') }}" class="block px-3 py-2 rounded-xl hover:bg-brand-50 text-gray-600">Settings</a>
                             @endcan
+                            @can('newsletter.manage')
+                            <a href="{{ route('admin.newsletters.index') }}" class="block px-3 py-2 rounded-xl hover:bg-brand-50 text-gray-600">Newsletters</a>
+                            @endcan
                             @can('users.edit')
                             <a href="{{ route('admin.permissions.index') }}" class="block px-3 py-2 rounded-xl hover:bg-brand-50 text-gray-600">Manage Permissions</a>
                             @endcan

@@ -467,12 +467,15 @@
             <div>
                 <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">{!! setting('newsletter_title', "Be first<br>to see<br><span class=\"italic text-plum\">what's new.</span>") !!}</h2>
                 <p class="text-sm text-ink/70 max-w-sm mb-8">{{ setting('newsletter_desc', 'New arrivals and news from G. Collection, in your inbox. Just your email, nothing else.') }}</p>
-                <form onsubmit="event.preventDefault(); alert('Thank you for subscribing to G. Collection newsletter!');">
+                <form action="{{ route('newsletter.subscribe') }}" method="POST" data-newsletter-form>
+                    @csrf
                     <label class="text-[11px] uppercase tracking-[0.2em] text-ink/60">Email</label>
                     <div class="flex border-b border-ink">
-                        <input type="email" required placeholder="you@example.com" class="flex-1 bg-transparent py-3 text-lg focus:outline-none placeholder:text-black/30">
-                        <button class="bg-ink text-white text-xs rounded-full px-5 my-2 hover:bg-plum transition">Subscribe</button>
+                        <input type="email" name="email" required autocomplete="email" placeholder="you@example.com" class="flex-1 bg-transparent py-3 text-lg focus:outline-none placeholder:text-black/30">
+                        <button type="submit" class="bg-ink text-white text-xs rounded-full px-5 my-2 hover:bg-plum transition">Subscribe</button>
                     </div>
+                    @error('email') <p class="text-xs text-red-700 mt-2">{{ $message }}</p> @enderror
+                    <p class="text-[11px] text-ink/50 mt-2">Subscribe for product news. Unsubscribe any time.</p>
                 </form>
             </div>
             <div class="flex justify-center">

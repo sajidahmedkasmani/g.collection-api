@@ -9,7 +9,7 @@ class Order extends Model
     protected $fillable = [
         'order_number', 'customer_name', 'email', 'phone',
         'address', 'city', 'payment_method', 'notes', 'customer_note',
-        'total', 'subtotal_paisa', 'status',
+        'total', 'subtotal_paisa', 'shipping_paisa', 'status',
     ];
 
     protected $casts = ['total' => 'decimal:2'];

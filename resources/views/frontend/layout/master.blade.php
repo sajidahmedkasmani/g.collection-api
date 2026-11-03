@@ -96,11 +96,8 @@
 
 @php
     $gcCart  = session('cart', []);
-    $gcCount = collect($gcCart)->sum(fn ($i) => $i['quantity'] ?? 1);
-    $gcTotal = collect($gcCart)->sum(fn ($i) => ($i['price'] ?? 0) * ($i['quantity'] ?? 1));
-    $gcFree  = (float) setting('free_shipping_threshold', 10000);
-    $gcLeft  = max(0, $gcFree - $gcTotal);
-    $gcPct   = $gcFree > 0 ? min(100, (int) round($gcTotal / $gcFree * 100)) : 100;
+    $gcSummary = \App\Support\CartSummary::for($gcCart);
+    $gcCount = $gcSummary['item_count'];
     $customer = auth('customer')->user();
     $gcNav = [
         ['Home', 'home'],
@@ -146,7 +143,7 @@
                    @unless($gcSkipDrawer) @click.prevent="cart = true; menu = false" @endunless>
                     <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
                     @if($gcCount > 0)
-                        <span class="absolute -top-2 -right-2 bg-rose text-white text-[10px] font-medium rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{{ $gcCount }}</span>
+                        <span data-cart-badge class="absolute -top-2 -right-2 bg-rose text-white text-[10px] font-medium rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{{ $gcCount }}</span>
                     @endif
                 </a>
 
@@ -322,72 +319,9 @@
                x-transition:leave="transition duration-200 ease-in" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
                class="absolute right-0 top-0 h-full w-[92%] max-w-md bg-cream flex flex-col shadow-2xl" role="dialog" aria-modal="true" aria-label="Cart">
 
-            <div class="flex items-center justify-between px-5 py-4 border-b border-black/10">
-                <h2 class="font-serif text-2xl">Your cart <span class="text-muted text-base font-sans">({{ $gcCount }})</span></h2>
-                <button @click="cart = false" aria-label="Close cart" class="p-1 -mr-1">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
-                </button>
+            <div id="gc-cart-drawer-content" class="flex-1 min-h-0 flex flex-col">
+                @include('frontend.partials.cart-drawer-content', ['cart' => $gcCart, 'summary' => $gcSummary])
             </div>
-
-            @if(empty($gcCart))
-                <div class="flex-1 flex flex-col items-center justify-center text-center px-8">
-                    <div class="w-28 h-36 arch bg-blush flex items-end justify-center pb-8">
-                        <svg class="w-9 h-9 text-plum" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
-                    </div>
-                    <p class="font-serif text-2xl mt-6">Nothing here yet</p>
-                    <p class="text-sm text-muted mt-1">Pieces you add will wait for you here.</p>
-                    <a href="{{ route('shop') }}" class="mt-6 bg-plum text-cream px-7 py-3 rounded-full text-sm font-medium hover:bg-ink transition">Browse the collection</a>
-                </div>
-            @else
-                <div class="px-5 pt-4 pb-3 border-b border-black/10">
-                    <p class="text-sm">
-                        @if($gcLeft > 0) Add <strong>Rs. {{ number_format($gcLeft) }}</strong> more for free shipping
-                        @else You've unlocked free shipping @endif
-                    </p>
-                    <div class="h-1.5 rounded-full bg-blush mt-2 overflow-hidden"><div class="h-full bg-rose rounded-full transition-all duration-700" style="width: {{ $gcPct }}%"></div></div>
-                </div>
-
-                <ul class="flex-1 overflow-y-auto px-5 divide-y divide-black/10">
-                    @foreach($gcCart as $id => $item)
-                        @php $q = $item['quantity'] ?? 1; @endphp
-                        <li class="flex gap-4 py-4">
-                            <img src="{{ $item['image'] ?? 'https://placehold.co/100x130' }}" alt="{{ $item['name'] }}" loading="lazy" class="w-20 h-28 object-cover rounded-lg bg-blush shrink-0">
-                            <div class="flex-1 min-w-0 flex flex-col">
-                                <div class="flex justify-between gap-3">
-                                    <p class="text-sm font-medium leading-snug">{{ $item['name'] }}</p>
-                                    <form action="{{ route('cart.remove') }}" method="POST" @submit="sessionStorage.setItem('gc_cart','1')">
-                                        @csrf
-                                        <input type="hidden" name="product_id" value="{{ $id }}">
-                                        <button aria-label="Remove {{ $item['name'] }}" class="text-black/40 hover:text-rose transition">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
-                                        </button>
-                                    </form>
-                                </div>
-                                <p class="text-sm text-muted mt-0.5">Rs. {{ number_format($item['price']) }}</p>
-                                <div class="mt-auto flex items-center justify-between">
-                                    <form action="{{ route('cart.update') }}" method="POST" class="inline-flex items-center border border-black/15 rounded-full" @submit="sessionStorage.setItem('gc_cart','1')">
-                                        @csrf
-                                        <input type="hidden" name="product_id" value="{{ $id }}">
-                                        <button name="quantity" value="{{ max(1, $q - 1) }}" @disabled($q <= 1) aria-label="Decrease quantity" class="w-8 h-8 flex items-center justify-center disabled:opacity-30">−</button>
-                                        <span class="w-6 text-center text-sm">{{ $q }}</span>
-                                        <button name="quantity" value="{{ $q + 1 }}" aria-label="Increase quantity" class="w-8 h-8 flex items-center justify-center">+</button>
-                                    </form>
-                                    <p class="text-sm font-semibold">Rs. {{ number_format($item['price'] * $q) }}</p>
-                                </div>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
-
-                <div class="border-t border-black/10 bg-white px-5 pt-4 pb-5" style="padding-bottom: max(1.25rem, env(safe-area-inset-bottom))">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm text-muted">Total</span>
-                        <span class="font-serif text-2xl">Rs. {{ number_format($gcTotal) }}</span>
-                    </div>
-                    <a href="{{ route('checkout.index') }}" class="block text-center bg-plum text-cream py-3.5 rounded-full font-medium hover:bg-ink transition">Checkout</a>
-                    <a href="{{ route('cart.index') }}" class="block text-center text-sm mt-3 text-muted hover:text-rose transition">View full cart</a>
-                </div>
-            @endif
         </aside>
     </div>
 
@@ -400,6 +334,15 @@
     @endif
 
     <main>@yield('content')</main>
+
+    <div id="gc-checkout-modal" class="hidden fixed inset-0 z-[90] bg-ink/50 backdrop-blur-sm p-3 sm:p-6" role="dialog" aria-modal="true" aria-label="Checkout">
+        <div class="relative bg-cream rounded-2xl max-w-5xl max-h-full overflow-y-auto mx-auto">
+            <button type="button" data-close-checkout class="sticky top-3 float-right z-10 mr-3 mt-3 bg-white rounded-full w-10 h-10 shadow" aria-label="Close checkout">×</button>
+            <div id="gc-checkout-content"></div>
+        </div>
+    </div>
+
+    <div id="gc-async-feedback" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[100] hidden rounded-xl px-5 py-3 text-sm shadow-lg" role="status" aria-live="polite"></div>
 
     <!-- FOOTER -->
     <footer class="bg-ink text-cream {{ $gcSkipDrawer ? '' : 'pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0' }}">
@@ -461,6 +404,167 @@
         </div>
     </footer>
 
+    <script>
+        (() => {
+            const csrf = document.querySelector('meta[name="csrf-token"]')?.content;
+            const feedback = document.getElementById('gc-async-feedback');
+            const checkoutModal = document.getElementById('gc-checkout-modal');
+            const checkoutContent = document.getElementById('gc-checkout-content');
+            const checkoutPath = @json(route('checkout.index', [], false));
+            let feedbackTimer;
+
+            const showMessage = (message, isError = false) => {
+                if (!feedback) return;
+                feedback.textContent = message;
+                feedback.className = `fixed bottom-5 left-1/2 -translate-x-1/2 z-[100] rounded-xl px-5 py-3 text-sm shadow-lg ${isError ? 'bg-red-700 text-white' : 'bg-ink text-white'}`;
+                clearTimeout(feedbackTimer);
+                feedbackTimer = setTimeout(() => feedback.classList.add('hidden'), 3500);
+            };
+
+            const closeCart = () => {
+                if (window.Alpine) window.Alpine.$data(document.body).cart = false;
+            };
+
+            const updateCart = (data) => {
+                document.querySelectorAll('[aria-label^="Cart,"]').forEach((link) => {
+                    link.setAttribute('aria-label', `Cart, ${data.summary.item_count} items`);
+                    let badge = link.querySelector('[data-cart-badge]');
+                    if (data.summary.item_count) {
+                        if (!badge) {
+                            badge = document.createElement('span');
+                            badge.dataset.cartBadge = '';
+                            badge.className = 'absolute -top-2 -right-2 bg-rose text-white text-[10px] font-medium rounded-full min-w-4 h-4 px-1 flex items-center justify-center';
+                            link.appendChild(badge);
+                        }
+                        badge.textContent = data.summary.item_count;
+                    } else if (badge) {
+                        badge.remove();
+                    }
+                });
+
+                const drawer = document.getElementById('gc-cart-drawer-content');
+                if (drawer) drawer.innerHTML = data.drawer_html;
+                const page = document.getElementById('gc-cart-page-content');
+                if (page) page.outerHTML = data.page_html;
+                window.dispatchEvent(new CustomEvent('gc:cart-updated', {detail: data}));
+            };
+
+            document.addEventListener('submit', async (event) => {
+                const form = event.target;
+                const action = new URL(form.action, window.location.href);
+
+                if (['/cart/add', '/cart/update', '/cart/remove'].includes(action.pathname)) {
+                    event.preventDefault();
+                    const button = form.querySelector('button[type="submit"], button:not([type])');
+                    if (button) button.disabled = true;
+                    try {
+                        const formData = new FormData(form);
+                        if (event.submitter?.name) formData.set(event.submitter.name, event.submitter.value);
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
+                            body: formData,
+                        });
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Could not update your cart.');
+                        updateCart(data);
+                        if (action.pathname === '/cart/add' && window.Alpine) window.Alpine.$data(document.body).cart = true;
+                        showMessage(data.message);
+                    } catch (error) {
+                        showMessage(error.message, true);
+                    } finally {
+                        if (button) button.disabled = false;
+                    }
+                    return;
+                }
+
+                if (action.pathname === checkoutPath) {
+                    event.preventDefault();
+                    const submit = form.querySelector('[type="submit"]');
+                    if (submit) submit.disabled = true;
+                    form.querySelectorAll('[data-checkout-error]').forEach((node) => node.textContent = '');
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
+                            body: new FormData(form),
+                        });
+                        const data = await response.json();
+                        if (response.status === 422 && data.errors) {
+                            Object.entries(data.errors).forEach(([field, messages]) => {
+                                const target = form.querySelector(`[data-checkout-error="${field}"]`);
+                                if (target) target.textContent = messages[0];
+                            });
+                            if (data.message) showMessage(data.message, true);
+                            return;
+                        }
+                        if (!response.ok) throw new Error(data.message || 'Could not place your order.');
+                        window.location.assign(data.redirect);
+                    } catch (error) {
+                        showMessage(error.message, true);
+                    } finally {
+                        if (submit) submit.disabled = false;
+                    }
+                    return;
+                }
+
+                if (form.matches('[data-newsletter-form]')) {
+                    event.preventDefault();
+                    const submit = form.querySelector('[type="submit"]');
+                    if (submit) submit.disabled = true;
+                    try {
+                        const response = await fetch(form.action, {
+                            method: 'POST',
+                            headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'},
+                            body: new FormData(form),
+                        });
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Could not subscribe.');
+                        showMessage(data.message);
+                        form.reset();
+                    } catch (error) {
+                        showMessage(error.message, true);
+                    } finally {
+                        if (submit) submit.disabled = false;
+                    }
+                }
+            });
+
+            document.addEventListener('click', async (event) => {
+                const closeButton = event.target.closest('[data-close-cart]');
+                if (closeButton) {
+                    closeCart();
+                    return;
+                }
+
+                const closeCheckout = event.target.closest('[data-close-checkout]');
+                if (closeCheckout || event.target === checkoutModal) {
+                    checkoutModal.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                    return;
+                }
+
+                const checkoutLink = event.target.closest('[data-checkout-link]');
+                if (checkoutLink && !event.metaKey && !event.ctrlKey && !event.shiftKey && event.button === 0) {
+                    event.preventDefault();
+                    try {
+                        const url = new URL(checkoutLink.href);
+                        url.searchParams.set('partial', '1');
+                        const response = await fetch(url, {headers: {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}});
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Could not open checkout.');
+                        checkoutContent.innerHTML = data.html;
+                        checkoutModal.classList.remove('hidden');
+                        document.body.classList.add('overflow-hidden');
+                        closeCart();
+                    } catch (error) {
+                        showMessage(error.message, true);
+                    }
+                }
+            });
+
+        })();
+    </script>
     @stack('scripts')
 </body>
 </html>

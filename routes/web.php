@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\FaqController;
+use App\Http\Controllers\Admin\NewsletterCampaignController;
+use App\Http\Controllers\NewsletterController;
 
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Controllers\CustomerRegisterController;
@@ -33,6 +35,10 @@ use App\Http\Controllers\CustomerProfileController;
         Route::post('/contact', 'send')->middleware('throttle:5,1')->name('contact.send');
     });
 
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])
+        ->middleware('throttle:5,1')->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])
+        ->name('newsletter.unsubscribe');
 
     // ===== CART =====
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -127,6 +133,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         ->middleware('can:users.edit')->name('permissions.store');
     Route::post('permissions/{permission}/toggle-active', [App\Http\Controllers\Admin\PermissionController::class, 'toggleActive'])
         ->middleware('can:users.edit')->name('permissions.toggle-active');
+
+    Route::get('newsletters', [NewsletterCampaignController::class, 'index'])
+        ->middleware('can:newsletter.manage')->name('newsletters.index');
+    Route::post('newsletters', [NewsletterCampaignController::class, 'store'])
+        ->middleware('can:newsletter.manage')->name('newsletters.store');
+    Route::post('newsletters/{campaign}/send-now', [NewsletterCampaignController::class, 'sendNow'])
+        ->middleware('can:newsletter.manage')->name('newsletters.send-now');
 
     Route::get('queue-monitor', [App\Http\Controllers\Admin\QueueMonitorController::class, 'index'])
         ->middleware('can:queue.view')->name('queue.monitor');

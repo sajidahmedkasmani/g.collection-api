@@ -7,6 +7,25 @@
     <form action="{{ route('admin.settings.update') }}" method="POST">
         @csrf
         <div class="grid gap-4 mb-4">
+            <div class="border-b pb-4">
+                <h3 class="font-semibold mb-3">Delivery Charges</h3>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-medium" for="shipping_fee">Standard shipping fee (Rs.)</label>
+                        <input id="shipping_fee" type="number" min="0" step="1" name="shipping_fee"
+                               value="{{ old('shipping_fee', $settings['shipping_fee'] ?? 250) }}"
+                               class="w-full border rounded-lg px-3 py-2 mt-1">
+                        @error('shipping_fee') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium" for="free_shipping_threshold">Free shipping from (Rs.)</label>
+                        <input id="free_shipping_threshold" type="number" min="0" step="1" name="free_shipping_threshold"
+                               value="{{ old('free_shipping_threshold', $settings['free_shipping_threshold'] ?? 10000) }}"
+                               class="w-full border rounded-lg px-3 py-2 mt-1">
+                        @error('free_shipping_threshold') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    </div>
+                </div>
+            </div>
             <div>
                 <label class="text-sm font-medium">Bank Name</label>
                 <input type="text" name="bank_name" value="{{ old('bank_name', $settings['bank_name'] ?? '') }}" class="w-full border rounded-lg px-3 py-2 mt-1">

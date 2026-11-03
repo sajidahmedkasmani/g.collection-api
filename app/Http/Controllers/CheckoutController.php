@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\EmailLog; // Naya import
+use App\Support\CartSummary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -18,10 +19,22 @@ class CheckoutController extends Controller
     {
         $cart = session()->get('cart', []);
         if (empty($cart)) {
+            if (request()->expectsJson()) {
+                return response()->json(['message' => 'Your cart is empty.'], 422);
+            }
+
             return redirect()->route('shop')->with('error', 'Your cart is empty.');
         }
-        $total = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
-        return view('frontend.shop.checkout', compact('cart', 'total'));
+        $summary = CartSummary::for($cart);
+        $viewData = compact('cart', 'summary');
+
+        if (request()->boolean('partial') && request()->expectsJson()) {
+            return response()->json([
+                'html' => view('frontend.shop._checkout_content', $viewData)->render(),
+            ]);
+        }
+
+        return view('frontend.shop.checkout', $viewData);
     }
 
     public function store(Request $request)
@@ -38,19 +51,31 @@ class CheckoutController extends Controller
 
         $cart = session()->get('cart', []);
         if (empty($cart)) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Your cart is empty.'], 422);
+            }
+
             return back()->with('error', 'Cart is empty.');
         }
 
         $productIds = array_keys($cart);
-        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+        $products = Product::whereIn('id', $productIds)->where('is_active', true)->get()->keyBy('id');
 
-        $total = 0;
+        $freshCart = [];
         foreach ($cart as $id => $item) {
             if (!isset($products[$id])) {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'One product is no longer available. Please update your cart.'], 422);
+                }
+
                 return back()->with('error', 'One product is no longer available.');
             }
-            $total += $products[$id]->price * $item['quantity'];
+            $freshCart[$id] = [
+                'price' => (float) $products[$id]->price,
+                'quantity' => (int) $item['quantity'],
+            ];
         }
+        $summary = CartSummary::for($freshCart);
 
         DB::beginTransaction();
         try {
@@ -65,8 +90,9 @@ class CheckoutController extends Controller
                 'payment_method' => $data['payment_method'],
                 'notes' => $data['notes'] ?? null,
                 'customer_note' => $data['notes'] ?? null,
-                'total' => $total,
-                'subtotal_paisa' => (int) round($total * 100),
+                'total' => $summary['total'],
+                'subtotal_paisa' => (int) round($summary['subtotal'] * 100),
+                'shipping_paisa' => (int) round($summary['shipping'] * 100),
                 'status' => 'pending',
             ]);
 
@@ -113,10 +139,24 @@ class CheckoutController extends Controller
                 ]);
             }
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'redirect' => route('order.success', $order->order_number),
+                    'message' => 'Order placed successfully.',
+                ]);
+            }
+
             return redirect()->route('order.success', $order->order_number);
 
         } catch (\Throwable $e) {
             DB::rollBack();
+
+            if ($request->expectsJson()) {
+                report($e);
+
+                return response()->json(['message' => 'We could not place your order. Please try again.'], 500);
+            }
+
             return back()->with('error', 'Order failed: ' . $e->getMessage());
         }
     }

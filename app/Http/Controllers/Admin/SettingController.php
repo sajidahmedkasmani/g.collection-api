@@ -23,6 +23,8 @@ class SettingController extends Controller
             'bank_account_no' => 'nullable|string|max:50',
             'bank_iban' => 'nullable|string|max:50',
             'whatsapp_number' => 'nullable|string|max:20',
+            'shipping_fee' => 'required|integer|min:0|max:100000',
+            'free_shipping_threshold' => 'required|integer|min:0|max:10000000',
         ]);
 
         Setting::setMany($data);
