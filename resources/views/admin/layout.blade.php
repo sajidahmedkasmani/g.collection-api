@@ -181,6 +181,9 @@
                             @can('settings.view')
                             <a href="{{ route('admin.settings.edit') }}" class="block px-3 py-2 rounded-xl hover:bg-brand-50 text-gray-600">Settings</a>
                             @endcan
+                            @can('users.edit')
+                            <a href="{{ route('admin.permissions.index') }}" class="block px-3 py-2 rounded-xl hover:bg-brand-50 text-gray-600">Manage Permissions</a>
+                            @endcan
                             <form method="POST" action="{{ route('logout') }}">@csrf
                                 <button class="w-full text-left px-3 py-2 rounded-xl hover:bg-red-50 text-red-500">Logout</button>
                             </form>

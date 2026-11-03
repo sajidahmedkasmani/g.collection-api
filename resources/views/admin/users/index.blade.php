@@ -15,6 +15,12 @@
                 <span class="text-base leading-none">+</span> Add New User
             </a>
         @endcan
+        @can('users.edit')
+            <a href="{{ route('admin.permissions.index') }}"
+               class="bg-white soft text-brand-700 px-5 py-2.5 rounded-xl text-xs font-semibold hover:bg-brand-50 transition">
+                Manage Permissions
+            </a>
+        @endcan
     </div>
 
     <div class="bg-white rounded-2xl soft overflow-hidden">

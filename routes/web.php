@@ -121,6 +121,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])
         ->name('users.toggle-active')->middleware('can:users.toggle-active');
 
+    Route::get('permissions', [App\Http\Controllers\Admin\PermissionController::class, 'index'])
+        ->middleware('can:users.edit')->name('permissions.index');
+    Route::post('permissions', [App\Http\Controllers\Admin\PermissionController::class, 'store'])
+        ->middleware('can:users.edit')->name('permissions.store');
+    Route::post('permissions/{permission}/toggle-active', [App\Http\Controllers\Admin\PermissionController::class, 'toggleActive'])
+        ->middleware('can:users.edit')->name('permissions.toggle-active');
 
     Route::get('queue-monitor', [App\Http\Controllers\Admin\QueueMonitorController::class, 'index'])
         ->middleware('can:queue.view')->name('queue.monitor');

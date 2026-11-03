@@ -33,7 +33,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('admin.dashboard', function ($user) {
-            return Schema::hasTable('permissions') && $user->permissions()->exists();
+            return Schema::hasTable('permissions')
+                && $user->permissions()->where('is_active', true)->exists();
         });
     }
 }

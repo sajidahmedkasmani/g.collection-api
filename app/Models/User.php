@@ -32,7 +32,10 @@ class User extends Authenticatable
      */
     public function hasPermission(string $permissionName): bool
     {
-        return $this->permissions->contains('name', $permissionName);
+        return $this->permissions()
+            ->where('name', $permissionName)
+            ->where('is_active', true)
+            ->exists();
     }
 
     /**
@@ -40,6 +43,9 @@ class User extends Authenticatable
      */
     public function hasAnyPermission(array $permissionNames): bool
     {
-        return $this->permissions->whereIn('name', $permissionNames)->isNotEmpty();
+        return $this->permissions()
+            ->whereIn('name', $permissionNames)
+            ->where('is_active', true)
+            ->exists();
     }
 }

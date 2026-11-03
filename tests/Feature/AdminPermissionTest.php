@@ -45,6 +45,44 @@ class AdminPermissionTest extends TestCase
         $this->actingAs($user)->get('/admin')->assertForbidden();
     }
 
+    public function test_user_with_user_edit_permission_can_create_and_deactivate_permissions(): void
+    {
+        $user = $this->createAdminUser();
+        $this->givePermission($user, 'users.edit');
+
+        $this->actingAs($user)
+            ->post('/admin/permissions', [
+                'name' => 'reports.view',
+                'label' => 'View Reports',
+                'module' => 'Reports',
+            ])
+            ->assertRedirect('/admin/permissions');
+
+        $permission = Permission::where('name', 'reports.view')->firstOrFail();
+        $this->assertTrue($permission->is_active);
+        $this->assertTrue($user->can('reports.view'));
+
+        $this->post("/admin/permissions/{$permission->id}/toggle-active")
+            ->assertRedirect();
+
+        $this->assertFalse($permission->fresh()->is_active);
+        $this->assertFalse($user->fresh()->can('reports.view'));
+    }
+
+    public function test_deactivated_permission_no_longer_grants_access(): void
+    {
+        $user = $this->createAdminUser();
+        $this->givePermission($user, 'products.view');
+        $this->givePermission($user, 'users.edit');
+        $permission = Permission::where('name', 'products.view')->firstOrFail();
+
+        $this->actingAs($user)
+            ->post("/admin/permissions/{$permission->id}/toggle-active")
+            ->assertRedirect();
+
+        $this->get('/admin/products')->assertForbidden();
+    }
+
     private function createAdminUser(): User
     {
         DB::table('users')->insert([

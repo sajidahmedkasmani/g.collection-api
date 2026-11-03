@@ -7,6 +7,7 @@ use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -19,7 +20,11 @@ class UserController extends Controller
 
     public function create()
     {
-        $permissions = Permission::orderBy('module')->orderBy('label')->get()->groupBy('module');
+        $permissions = Permission::where('is_active', true)
+            ->orderBy('module')
+            ->orderBy('label')
+            ->get()
+            ->groupBy('module');
 
         return view('admin.users.create', compact('permissions'));
     }
@@ -32,7 +37,7 @@ class UserController extends Controller
             'password'      => ['required', 'string', 'min:8', 'confirmed'],
             'is_active'     => ['boolean'],
             'permissions'   => ['nullable', 'array'],
-            'permissions.*' => ['integer', 'exists:permissions,id'],
+            'permissions.*' => ['integer', Rule::exists('permissions', 'id')->where('is_active', true)],
         ]);
 
         $user = User::create([
@@ -50,7 +55,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        $permissions = Permission::orderBy('module')->orderBy('label')->get()->groupBy('module');
+        $permissions = Permission::where('is_active', true)->orderBy('module')->orderBy('label')->get()->groupBy('module');
         $userPermissions = $user->permissions->pluck('id')->toArray();
 
         return view('admin.users.edit', compact('user', 'permissions', 'userPermissions'));
@@ -64,7 +69,7 @@ class UserController extends Controller
             'password'      => ['nullable', 'string', 'min:8', 'confirmed'],
             'is_active'     => ['boolean'],
             'permissions'   => ['nullable', 'array'],
-            'permissions.*' => ['integer', 'exists:permissions,id'],
+            'permissions.*' => ['integer', Rule::exists('permissions', 'id')->where('is_active', true)],
         ]);
 
         $user->fill([
@@ -79,7 +84,11 @@ class UserController extends Controller
 
         $user->save();
 
-        $user->permissions()->sync($data['permissions'] ?? []);
+        $inactivePermissionIds = $user->permissions()
+            ->where('is_active', false)
+            ->pluck('permissions.id')
+            ->all();
+        $user->permissions()->sync(array_merge($data['permissions'] ?? [], $inactivePermissionIds));
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User updated successfully.');
