@@ -66,7 +66,7 @@
             @endphp
             <div class="rise bg-white rounded-3xl soft p-4" style="--d:{{ min($loop->index, 8) * 0.04 }}s">
                 <div class="flex items-center justify-between gap-3 mb-3">
-                    <a href="{{ route('admin.orders.view_order', $o) }}" class="font-mono text-xs text-brand-600">{{ $o->order_number }}</a>
+                    <a href="{{ route('admin.orders.show', $o) }}" class="font-mono text-xs text-brand-600">{{ $o->order_number }}</a>
                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium {{ $sb }}">
                         <span class="w-1.5 h-1.5 rounded-full {{ $sd }}"></span>{{ ucfirst($o->status) }}
                     </span>
@@ -105,7 +105,7 @@
                         <p class="text-[10px] uppercase tracking-wider text-gray-400">Date</p>
                         <p class="text-xs text-gray-500">{{ $o->created_at->format('d M Y') }}</p>
                     </div>
-                    <a href="{{ route('admin.orders.view_order', $o) }}" class="bg-brand-600 text-white text-xs font-medium rounded-xl px-4 py-2.5 active:scale-95 transition">View</a>
+                    <a href="{{ route('admin.orders.show', $o) }}" class="bg-brand-600 text-white text-xs font-medium rounded-xl px-4 py-2.5 active:scale-95 transition">View</a>
                 </div>
             </div>
         @empty
@@ -130,7 +130,7 @@
                 $wa = $waLink($o->phone);
             @endphp
             <div class="grid {{ $cols }} gap-x-3 items-center px-5 py-3.5 border-t border-gray-100 hover:bg-brand-50/30 transition text-sm">
-                <a href="{{ route('admin.orders.view_order', $o) }}" class="font-mono text-xs text-brand-600 hover:underline truncate">{{ $o->order_number }}</a>
+                <a href="{{ route('admin.orders.show', $o) }}" class="font-mono text-xs text-brand-600 hover:underline truncate">{{ $o->order_number }}</a>
 
                 <div class="flex items-center gap-3 min-w-0">
                     <span class="w-9 h-9 rounded-full bg-brand-100 text-brand-600 text-xs font-semibold flex items-center justify-center shrink-0">{{ strtoupper(substr($o->customer_name, 0, 1)) }}</span>
@@ -156,7 +156,7 @@
                 <span class="text-xs text-gray-400 whitespace-nowrap">{{ $o->created_at->format('d M Y') }}</span>
 
                 <span class="text-right">
-                    <a href="{{ route('admin.orders.view_order', $o) }}" class="inline-block bg-brand-50 text-brand-600 hover:bg-brand-600 hover:text-white text-xs font-medium rounded-xl px-4 py-2 transition">View</a>
+                    <a href="{{ route('admin.orders.show', $o) }}" class="inline-block bg-brand-50 text-brand-600 hover:bg-brand-600 hover:text-white text-xs font-medium rounded-xl px-4 py-2 transition">View</a>
                 </span>
             </div>
         @empty

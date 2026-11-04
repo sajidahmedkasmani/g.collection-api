@@ -141,7 +141,7 @@
             <div class="md:hidden space-y-3">
                 @forelse($orders as $o)
                     @php $st = strtolower($o->status); @endphp
-                    <a href="{{ route('admin.orders.view_order', $o) }}" class="block rounded-2xl border border-gray-100 p-4 active:bg-brand-50 transition">
+                    <a href="{{ route('admin.orders.show', $o) }}" class="block rounded-2xl border border-gray-100 p-4 active:bg-brand-50 transition">
                         <div class="flex items-center justify-between gap-3">
                             <div class="flex items-center gap-3 min-w-0">
                                 <span class="w-9 h-9 rounded-full bg-brand-100 text-brand-600 text-xs font-semibold flex items-center justify-center shrink-0">{{ strtoupper(substr($o->customer_name, 0, 1)) }}</span>
@@ -179,7 +179,7 @@
                             @php $st = strtolower($o->status); @endphp
                             <tr class="border-t border-gray-100 hover:bg-brand-50/50 transition">
                                 <td class="py-3">
-                                    <a href="{{ route('admin.orders.view_order', $o) }}" class="text-brand-600 font-mono text-xs hover:underline">{{ $o->order_number }}</a>
+                                    <a href="{{ route('admin.orders.show', $o) }}" class="text-brand-600 font-mono text-xs hover:underline">{{ $o->order_number }}</a>
                                 </td>
                                 <td>
                                     <div class="flex items-center gap-2">
