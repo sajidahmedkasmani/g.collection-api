@@ -46,19 +46,17 @@
                 <textarea name="answer" rows="4" required placeholder="Detailed response for customer..." class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none leading-relaxed">{{ old('answer', $faq->answer) }}</textarea>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">Sort Order</label>
-                    <input type="number" name="sort_order" value="{{ old('sort_order', $faq->sort_order ?? 0) }}" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-500 outline-none">
-                    <span class="text-[11px] text-gray-400 mt-1 block">Lower numbers appear first.</span>
-                </div>
+            {{-- Order is now set by dragging rows on the FAQ list; new FAQs go to the end automatically --}}
+            <input type="hidden" name="sort_order" value="{{ old('sort_order', $faq->exists ? $faq->sort_order : ((\App\Models\Faq::max('sort_order') ?? 0) + 1)) }}">
 
-                <div class="flex items-center pt-6">
-                    <label class="inline-flex items-center gap-2.5 cursor-pointer">
-                        <input type="checkbox" name="is_active" value="1" {{ old('is_active', $faq->is_active ?? true) ? 'checked' : '' }} class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
-                        <span class="text-sm font-medium text-gray-700">Display this FAQ publicly</span>
-                    </label>
-                </div>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-lav/50 rounded-2xl px-4 py-3.5">
+                <label class="inline-flex items-center gap-2.5 cursor-pointer">
+                    <input type="checkbox" name="is_active" value="1" {{ old('is_active', $faq->is_active ?? true) ? 'checked' : '' }} class="w-4 h-4 rounded text-brand-600 focus:ring-brand-500">
+                    <span class="text-sm font-medium text-gray-700">Display this FAQ publicly</span>
+                </label>
+                <p class="text-[11px] text-gray-400">
+                    {{ $faq->exists ? 'To change the position, drag it on the FAQ list.' : 'New FAQs are added at the end. Drag to reorder from the FAQ list.' }}
+                </p>
             </div>
 
             <div class="pt-4 border-t border-gray-100 flex items-center justify-end gap-3">

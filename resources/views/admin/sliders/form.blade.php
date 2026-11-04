@@ -150,11 +150,10 @@
             {{-- Settings (always visible) --}}
             <div class="bg-white rounded-xl shadow-sm p-6">
                 <h3 class="font-bold mb-4">Settings</h3>
-                <div class="grid grid-cols-3 gap-4">
-                    <div>
-                        <label class="text-sm font-medium">Sort Order</label>
-                        <input type="number" name="sort_order" value="{{ old('sort_order', $slider->sort_order ?? 0) }}" class="w-full border rounded-lg px-3 py-2 mt-1">
-                    </div>
+                {{-- Order is set by dragging on the sliders list; new sliders go to the end automatically --}}
+                <input type="hidden" name="sort_order" value="{{ old('sort_order', $slider->exists ? $slider->sort_order : ((\App\Models\Slider::max('sort_order') ?? 0) + 1)) }}">
+
+                <div class="grid sm:grid-cols-2 gap-4">
                     <div>
                         <label class="text-sm font-medium">Slide Duration (ms)</label>
                         <input type="number" name="slide_duration" value="{{ old('slide_duration', $slider->slide_duration ?? 5500) }}" class="w-full border rounded-lg px-3 py-2 mt-1">
@@ -173,6 +172,9 @@
                     <input type="checkbox" name="is_active" value="1" @checked(old('is_active', $slider->is_active ?? true))>
                     <span class="text-sm">Active (visible on homepage)</span>
                 </label>
+                <p class="text-xs text-gray-400 mt-3">
+                    {{ $slider->exists ? 'To change this slide\'s position, drag it on the sliders list.' : 'New sliders are added at the end. Drag to reorder from the sliders list.' }}
+                </p>
             </div>
         </div>
 

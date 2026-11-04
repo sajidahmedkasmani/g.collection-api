@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+    use Illuminate\Support\Facades\DB;
 
 class SliderController extends Controller
 {
@@ -65,12 +66,34 @@ class SliderController extends Controller
         return back()->with('success', 'Slider deleted.');
     }
 
+    // public function reorder(Request $request)
+    // {
+    //     $request->validate(['order' => 'required|array', 'order.*' => 'integer|exists:home_sliders,id']);
+    //     foreach ($request->order as $i => $id) {
+    //         HomeSlider::where('id', $id)->update(['sort_order' => $i]);
+    //     }
+    //     return response()->json(['ok' => true]);
+    // }
+
     public function reorder(Request $request)
     {
-        $request->validate(['order' => 'required|array', 'order.*' => 'integer|exists:home_sliders,id']);
-        foreach ($request->order as $i => $id) {
-            HomeSlider::where('id', $id)->update(['sort_order' => $i]);
-        }
+        abort_unless($request->user()->can('sliders.edit'), 403);
+
+        $ids = $request->validate([
+            'ids'   => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:sliders,id'],
+        ])['ids'];
+
+        DB::transaction(function () use ($ids) {
+            $slots = Slider::whereIn('id', $ids)->pluck('sort_order')->sort()->values();
+            if ($slots->unique()->count() !== count($ids)) {
+                $slots = collect(range(1, count($ids)));   // fallback if numbers were duplicated or all 0
+            }
+            foreach ($ids as $i => $id) {
+                Slider::where('id', $id)->update(['sort_order' => $slots[$i]]);
+            }
+        });
+
         return response()->json(['ok' => true]);
     }
 

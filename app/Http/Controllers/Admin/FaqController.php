@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Faq;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class FaqController extends Controller
 {
@@ -83,5 +84,29 @@ class FaqController extends Controller
     {
         $faq->update(['is_active' => !$faq->is_active]);
         return back()->with('success', 'FAQ status updated.');
+    }
+
+
+    public function reorder(Request $request)
+    {
+        abort_unless($request->user()->can('faqs.edit'), 403);
+
+        $ids = $request->validate([
+            'ids'   => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:faqs,id'],
+        ])['ids'];
+
+        DB::transaction(function () use ($ids) {
+            // reuse the existing sort_order slots so category-filtered views stay consistent
+            $slots = Faq::whereIn('id', $ids)->pluck('sort_order')->sort()->values();
+            if ($slots->unique()->count() !== count($ids)) {
+                $slots = collect(range(1, count($ids)));   // fallback if numbers were duplicated or all 0
+            }
+            foreach ($ids as $i => $id) {
+                Faq::where('id', $id)->update(['sort_order' => $slots[$i]]);
+            }
+        });
+
+        return response()->json(['ok' => true]);
     }
 }

@@ -117,6 +117,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::delete('faqs/{faq}', [FaqController::class, 'destroy'])->middleware('can:faqs.delete')->name('faqs.destroy');
     Route::post('faqs/{faq}/toggle-active', [FaqController::class, 'toggleActive'])
         ->middleware('can:faqs.edit')->name('faqs.toggle-active');
+    Route::post('faqs/reorder', [FaqController::class, 'reorder'])->name('faqs.reorder');
 
     // Sliders
     Route::get('sliders', [SliderController::class, 'index'])->middleware('can:sliders.view')->name('sliders.index');
