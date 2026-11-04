@@ -8,7 +8,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-    use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
 
 class SliderController extends Controller
 {
@@ -81,7 +81,7 @@ class SliderController extends Controller
 
         $ids = $request->validate([
             'ids'   => ['required', 'array', 'min:1'],
-            'ids.*' => ['integer', 'exists:sliders,id'],
+            'ids.*' => ['integer', 'exists:home_sliders,id'],
         ])['ids'];
 
         DB::transaction(function () use ($ids) {

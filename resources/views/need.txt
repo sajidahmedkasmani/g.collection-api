@@ -1,4 +1,4 @@
-1. Reordering in FAQS & sliders
+1. Reordering in FAQS & sliders   done
 2. remove duplicate things in cms and settings etc
 3. redesign view order page and add/edit product
 4. work on category and collection
