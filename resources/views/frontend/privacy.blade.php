@@ -1,14 +1,14 @@
 @extends('frontend.policies.layout')
-<!-- @extends('frontend.layout.master') -->
 
 @section('title', 'Privacy policy')
 @section('heading', 'Privacy policy')
 @section('lead', 'What we collect, and why.')
+@section('bg-text', 'Privacy')
 
-@php
+<!-- @php
     // ── OPTIONAL: extra paragraph (e.g. data retention, third parties). null = hidden ──
     $extra = null;
-@endphp
+@endphp -->
 
 @section('policy')
     <section class="py-7">

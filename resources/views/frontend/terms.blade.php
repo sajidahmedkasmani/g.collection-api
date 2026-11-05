@@ -1,16 +1,16 @@
-<!-- @extends('frontend.policies.layout') -->
-@extends('frontend.layout.master')
+@extends('frontend.policies.layout')
 
 @section('title', 'Terms & conditions')
 @section('heading', 'Terms & conditions')
 @section('lead', 'The simple ground rules for shopping with G. Collection.')
+@section('bg-text', 'Terms')
 
 @php
     // ── OPTIONAL: extra terms, one per line. Empty array = hidden ──
     $otherTerms = [];
 @endphp
 
-@section('content')
+@section('policy')
     <section class="py-7">
         <h2 class="font-serif text-2xl mb-3">Orders</h2>
         <p class="text-[15px] leading-relaxed text-ink/80">Orders are confirmed by the store after you submit them.</p>

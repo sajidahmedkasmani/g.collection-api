@@ -1,10 +1,10 @@
-<!-- @extends('frontend.policies.layout') -->
-@extends('frontend.layout.master')
+@extends('frontend.policies.layout')
 
 
 @section('title', 'Shipping information')
 @section('heading', 'Shipping information')
 @section('lead', 'How your order gets from our Karachi studio to your door.')
+@section('bg-text', 'Shipping')
 
 @php
     // ── FILL THESE IN (plain text). Leave as null to hide that section. ──
@@ -19,7 +19,7 @@
     ]);
 @endphp
 
-@section('content')
+@section('policy')
     <div class="py-7 flex items-center gap-5">
         <div class="w-14 h-[72px] arch bg-blush flex items-end justify-center pb-3 shrink-0">
             <svg class="w-7 h-7 text-plum" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19.5a1.5 1.5 0 1 0 0-.01M17 19.5a1.5 1.5 0 1 0 0-.01"/></svg>

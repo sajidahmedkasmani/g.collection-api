@@ -1,9 +1,9 @@
-<!-- @extends('frontend.policies.layouts') -->
-@extends('frontend.layout.master')
+@extends('frontend.policies.layout')
 
 @section('title', 'Returns & exchanges')
 @section('heading', 'Returns & exchanges')
 @section('lead', 'Something not quite right? Reach out and we will sort it together.')
+@section('bg-text', 'Returns')
 
 @php
     // ── FILL THESE IN (plain text). Leave as null to hide that section. ──
@@ -18,7 +18,7 @@
     ]);
 @endphp
 
-@section('content')
+@section('policy')
     <section class="py-7">
         <h2 class="font-serif text-2xl mb-3">Start a return or exchange</h2>
         <p class="text-[15px] leading-relaxed text-ink/80 mb-4">Please contact us to start a return or exchange, and keep your order number handy.</p>
