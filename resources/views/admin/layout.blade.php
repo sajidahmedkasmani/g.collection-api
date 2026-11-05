@@ -70,6 +70,7 @@
     $nav = [
         ['Dashboard', 'admin.dashboard',      'admin.dashboard',   'M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10'],
         ['Products',  'admin.products.index', 'admin.products.*',  'M20 7l-8-4-8 4m16 0v10l-8 4m8-14l-8 4m0 10L4 17V7m8 14V11'],
+        ['Collections', 'admin.catalog.index', 'admin.catalog.*', 'M4 5h16M4 12h16M4 19h16'],
         ['Orders',    'admin.orders.index',   'admin.orders.*',    'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 5h6M9 12h6M9 16h4'],
         ['Sliders',   'admin.sliders.index',  'admin.sliders.*',   'M4 5a1 1 0 011-1h14a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm4 14h8m-4-4v4'],
         ['CMS Content','admin.cms.index',     'admin.cms.*',       'M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm3 4h10M7 14h7'],
@@ -81,6 +82,7 @@
     $navPermissions = [
         'admin.dashboard' => 'admin.dashboard',
         'admin.products.index' => 'products.view',
+        'admin.catalog.index' => 'products.view',
         'admin.orders.index' => 'orders.view',
         'admin.sliders.index' => 'sliders.view',
         'admin.cms.index' => 'cms.view',

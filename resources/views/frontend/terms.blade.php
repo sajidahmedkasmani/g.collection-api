@@ -10,7 +10,7 @@
     $otherTerms = [];
 @endphp
 
-@section('policy')
+@section('content')
     <section class="py-7">
         <h2 class="font-serif text-2xl mb-3">Orders</h2>
         <p class="text-[15px] leading-relaxed text-ink/80">Orders are confirmed by the store after you submit them.</p>

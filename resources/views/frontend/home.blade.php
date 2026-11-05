@@ -16,7 +16,7 @@
         return 'https://placehold.co/'.$w.'x'.$h.'/F8DCE8/5B1A4A?text='.urlencode($p->name ?? 'Product');
     };
 
-    $cat = fn($p) => $p->category ?? '';
+    $cat = fn($p) => $p->productCategory?->name ?? ($p->category ?? '');
 @endphp
 
 
@@ -158,43 +158,43 @@
 
 
 
+    <section class="max-w-3xl mx-auto px-6 pb-12" id="home-search">
+        <form method="GET" action="{{ route('shop') }}" class="flex items-center gap-3 bg-white rounded-full border border-black/10 p-2 pl-5 shadow-sm focus-within:ring-4 ring-plum/10">
+            <svg class="w-5 h-5 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" name="q" value="{{ request('q') }}" placeholder="Search products, clothing, bags..." aria-label="Search products"
+                   class="flex-1 min-w-0 bg-transparent py-3 text-sm focus:outline-none">
+            <button type="submit" class="bg-plum text-white text-sm rounded-full px-6 py-3 hover:bg-ink transition">Search</button>
+        </form>
+    </section>
+
 <!-- {{-- ============ COLLECTIONS ============ --}} -->
     <section class="max-w-7xl mx-auto px-6 py-24">
-        <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-14">{!! nl2br(e(setting('collections_title', "Three ways\nto dress the day."))) !!}</h2>
-        <p class="md:ml-auto md:max-w-[200px] text-xs text-muted -mt-24 mb-16 hidden md:block">{{ setting('collections_subtitle', 'Stitched, unstitched and everything that goes with it. Pick a collection to start.') }}</p>
+        <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">Explore our collections</h2>
+        <p class="text-sm text-muted mb-10">Browse clothing, bags and more by collection and category.</p>
 
-        <div class="grid md:grid-cols-3 gap-5 items-end">
-            @php
-                $colCards = [
-                    [
-                        setting('collection_1_title', 'Stitched'),
-                        setting('collection_1_slug', 'stitched'),
-                        'h-[420px]',
-                        cms_image('collection_1_image', $ph($p1))
-                    ],
-                    [
-                        setting('collection_2_title', 'Unstitched'),
-                        setting('collection_2_slug', 'unstitched'),
-                        'h-[360px] md:mb-0',
-                        cms_image('collection_2_image', $ph($p2))
-                    ],
-                    [
-                        setting('collection_3_title', 'Accessories'),
-                        setting('collection_3_slug', 'accessories'),
-                        'h-[420px]',
-                        cms_image('collection_3_image', $ph($p3))
-                    ],
-                ];
-            @endphp
-            @foreach($colCards as [$title,$slug,$h,$imgUrl])
-                <a href="{{ route('shop') }}?category={{ $slug }}" class="group relative block {{ $h }} overflow-hidden rounded-t-[999px] bg-blush">
-                    <img src="{{ $imgUrl }}" alt="{{ $title }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" loading="lazy">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    <div class="absolute bottom-5 left-6 right-5 flex items-end justify-between text-white">
-                        <p class="font-serif text-3xl">{{ $title }}</p>
-                        <span class="w-9 h-9 rounded-full bg-white text-ink flex items-center justify-center group-hover:bg-rose group-hover:text-white transition">→</span>
+        <div class="grid md:grid-cols-3 gap-5 items-start">
+            @foreach($collections->take(3) as $index => $collection)
+                @php
+                    $fallbackProducts = [$p1, $p2, $p3];
+                    $imageUrl = cms_image('collection_' . ($index + 1) . '_image', $ph($fallbackProducts[$index] ?? null));
+                    $height = $index === 1 ? 'h-[360px]' : 'h-[420px]';
+                @endphp
+                <div>
+                    <a href="{{ route('shop', ['collection' => $collection->slug]) }}" class="group relative block {{ $height }} overflow-hidden rounded-t-[999px] bg-blush">
+                        <img src="{{ $imageUrl }}" alt="{{ $collection->name }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-700" loading="lazy">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-5 left-6 right-5 flex items-end justify-between text-white">
+                            <p class="font-serif text-3xl">{{ $collection->name }}</p>
+                            <span class="w-9 h-9 rounded-full bg-white text-ink flex items-center justify-center group-hover:bg-rose group-hover:text-white transition">→</span>
+                        </div>
+                    </a>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        @foreach($collection->categories as $category)
+                            <a href="{{ route('shop', ['collection' => $collection->slug, 'category' => $category->slug]) }}"
+                               class="text-xs border border-black/15 rounded-full px-3 py-1.5 hover:border-plum hover:text-plum">{{ $category->name }}</a>
+                        @endforeach
                     </div>
-                </a>
+                </div>
             @endforeach
         </div>
     </section>

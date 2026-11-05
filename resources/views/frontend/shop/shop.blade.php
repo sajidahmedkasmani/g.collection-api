@@ -6,12 +6,19 @@
     if (method_exists($products, 'withQueryString')) { $products = $products->withQueryString(); }
 
     $cat   = request('category');
+    $collection = request('collection');
     $q     = trim((string) request('q'));
     $sort  = request('sort', 'newest');
-    $cats  = ['' => 'All', 'stitched' => 'Stitched', 'unstitched' => 'Unstitched', 'accessories' => 'Accessories'];
     $total = method_exists($products, 'total') ? $products->total() : $products->count();
-    $heading = $cat ? ($cats[$cat] ?? ucfirst($cat)) : 'The Collection';
-    $chipUrl = fn($c) => route('shop', array_filter(['category' => $c, 'q' => $q, 'sort' => request('sort')]));
+    $selectedCategory = $categories->firstWhere('slug', $cat);
+    $selectedCollection = $collections->firstWhere('slug', $collection);
+    $heading = $selectedCategory?->name ?? $selectedCollection?->name ?? 'The Collection';
+    $chipUrl = fn($categorySlug) => route('shop', array_filter([
+        'collection' => $collection,
+        'category' => $categorySlug,
+        'q' => $q,
+        'sort' => request('sort'),
+    ]));
     $paged = method_exists($products, 'hasPages') && $products->hasPages();
 @endphp
 
@@ -21,8 +28,9 @@
     <div class="max-w-7xl mx-auto px-5 md:px-6 pt-8 md:pt-14 pb-10 md:pb-14 relative">
         <nav class="text-[11px] uppercase tracking-[0.2em] text-plum/70 mb-5 flex items-center gap-2">
             <a href="{{ route('home') }}" class="hover:text-plum">Home</a><span>/</span>
-            <a href="{{ route('shop') }}" class="hover:text-plum {{ $cat ? '' : 'text-plum' }}">Shop</a>
-            @if($cat)<span>/</span><span class="text-plum">{{ $cats[$cat] ?? ucfirst($cat) }}</span>@endif
+            <a href="{{ route('shop') }}" class="hover:text-plum {{ $cat || $collection ? '' : 'text-plum' }}">Shop</a>
+            @if($selectedCollection)<span>/</span><span>{{ $selectedCollection->name }}</span>@endif
+            @if($selectedCategory)<span>/</span><span class="text-plum">{{ $selectedCategory->name }}</span>@endif
         </nav>
 
         <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
@@ -36,6 +44,7 @@
 
             <form method="GET" action="{{ route('shop') }}" class="flex items-center gap-2 bg-white rounded-full pl-5 pr-1.5 py-1.5 w-full md:w-80 shadow-[0_10px_30px_-18px_rgba(91,26,74,.5)] focus-within:ring-4 ring-plum/10 transition">
                 @if($cat)<input type="hidden" name="category" value="{{ $cat }}">@endif
+                @if($collection)<input type="hidden" name="collection" value="{{ $collection }}">@endif
                 @if(request('sort'))<input type="hidden" name="sort" value="{{ request('sort') }}">@endif
                 <svg class="w-4 h-4 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>
                 <input type="search" name="q" value="{{ $q }}" placeholder="Search kurtas, lace, lawn..." class="flex-1 bg-transparent text-sm py-2 focus:outline-none placeholder:text-black/30 min-w-0">
@@ -48,16 +57,28 @@
 {{-- ============ FILTER BAR (sticky) ============ --}}
 <div class="sticky top-[65px] z-40 bg-cream/90 backdrop-blur border-b border-black/10">
     <div class="max-w-7xl mx-auto px-5 md:px-6 py-3 flex items-center justify-between gap-4">
-        <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 flex-1">
-            @foreach($cats as $slug => $label)
-                @php $on = (string) $cat === (string) $slug; @endphp
-                <a href="{{ $chipUrl($slug ?: null) }}"
-                   class="shrink-0 text-xs rounded-full border px-5 py-2.5 transition {{ $on ? 'bg-plum text-white border-plum' : 'border-black/15 text-ink/70 hover:border-plum hover:text-plum' }}">{{ $label }}</a>
-            @endforeach
+        <div class="flex flex-col gap-2 flex-1 min-w-0">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
+                <a href="{{ route('shop', array_filter(['q' => $q, 'sort' => request('sort')])) }}"
+                   class="shrink-0 text-xs rounded-full border px-5 py-2.5 transition {{ !$collection && !$cat ? 'bg-plum text-white border-plum' : 'border-black/15 text-ink/70 hover:border-plum hover:text-plum' }}">All</a>
+                @foreach($collections as $item)
+                    <a href="{{ route('shop', array_filter(['collection' => $item->slug, 'q' => $q, 'sort' => request('sort')])) }}"
+                       class="shrink-0 text-xs rounded-full border px-5 py-2.5 transition {{ $collection === $item->slug ? 'bg-plum text-white border-plum' : 'border-black/15 text-ink/70 hover:border-plum hover:text-plum' }}">{{ $item->name }}</a>
+                @endforeach
+            </div>
+            @if($collection)
+                <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1">
+                    @foreach($categories->where('collection.slug', $collection) as $item)
+                        <a href="{{ $chipUrl($item->slug) }}"
+                           class="shrink-0 text-[11px] rounded-full border px-4 py-2 transition {{ $cat === $item->slug ? 'bg-ink text-white border-ink' : 'border-black/10 text-ink/60 hover:border-plum hover:text-plum' }}">{{ $item->name }}</a>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
         <form method="GET" action="{{ route('shop') }}" class="shrink-0">
             @if($cat)<input type="hidden" name="category" value="{{ $cat }}">@endif
+            @if($collection)<input type="hidden" name="collection" value="{{ $collection }}">@endif
             @if($q)<input type="hidden" name="q" value="{{ $q }}">@endif
             <label class="sr-only" for="sort">Sort</label>
             <select id="sort" name="sort" onchange="this.form.submit()"

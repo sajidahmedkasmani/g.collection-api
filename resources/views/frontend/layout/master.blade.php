@@ -98,6 +98,7 @@
         $gcCart  = session('cart', []);
         $gcSummary = \App\Support\CartSummary::for($gcCart);
         $gcCount = $gcSummary['item_count'];
+        $gcWishlistCount = count(array_unique(array_map('intval', session('wishlist', []))));
         $customer = auth('customer')->user();
         $gcNav = [
             ['Home', 'home'],
@@ -131,11 +132,12 @@
             </nav>
 
             <div class="flex items-center gap-4 sm:gap-5">
-                <a href="{{ route('shop') }}" aria-label="Search" class="hover:text-rose transition">
+                <a href="{{ route('home') }}#home-search" aria-label="Search products" class="hover:text-rose transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
                 </a>
-                <a href="#" aria-label="Wishlist" class="hidden md:block hover:text-rose transition">
+                <a href="{{ route('wishlist.index') }}" aria-label="Wishlist, {{ $gcWishlistCount }} items" class="relative hover:text-rose transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.3 5.3 0 0 1 12 6a5.3 5.3 0 0 1 9.3 6C19 16.4 12 21 12 21Z"/></svg>
+                    <span data-wishlist-count class="absolute -top-2 -right-2 {{ $gcWishlistCount ? '' : 'hidden' }} bg-rose text-white text-[10px] rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{{ $gcWishlistCount }}</span>
                 </a>
 
                 {{-- Cart (on mobile it lives in the bottom bar, except on cart/checkout pages where the bar is hidden) --}}
@@ -558,6 +560,45 @@
             });
 
             document.addEventListener('click', async (event) => {
+                const wishlistButton = event.target.closest('[data-wishlist-toggle]');
+                if (wishlistButton) {
+                    try {
+                        const response = await fetch(@json(url('/wishlist')) + '/' + wishlistButton.dataset.productId + '/toggle', {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-CSRF-TOKEN': csrf,
+                            },
+                        });
+                        const data = await response.json();
+                        if (!response.ok) throw new Error(data.message || 'Could not update your wishlist.');
+                        document.querySelectorAll(`[data-wishlist-toggle][data-product-id="${wishlistButton.dataset.productId}"]`).forEach((button) => {
+                            button.setAttribute('aria-pressed', data.added ? 'true' : 'false');
+                            button.setAttribute('aria-label', data.added ? 'Remove from wishlist' : 'Add to wishlist');
+                            button.classList.toggle('text-rose', data.added);
+                            button.classList.toggle('text-ink/70', !data.added);
+                            button.querySelector('svg')?.setAttribute('fill', data.added ? 'currentColor' : 'none');
+                            const label = button.querySelector('[data-wishlist-label]');
+                            if (label) label.textContent = data.added ? 'Saved to wishlist' : 'Add to wishlist';
+                        });
+                        document.querySelectorAll('[data-wishlist-count]').forEach((badge) => {
+                            badge.textContent = data.count;
+                            badge.classList.toggle('hidden', data.count === 0);
+                        });
+                        const headerWishlist = document.querySelector('[aria-label^="Wishlist,"]');
+                        if (headerWishlist) headerWishlist.setAttribute('aria-label', `Wishlist, ${data.count} items`);
+                        if (!data.added && window.location.pathname === @json(route('wishlist.index', [], false))) {
+                            window.location.reload();
+                            return;
+                        }
+                        showMessage(data.message);
+                    } catch (error) {
+                        showMessage(error.message, true);
+                    }
+                    return;
+                }
+
                 const quantityStep = event.target.closest('[data-quantity-step]');
                 if (quantityStep) {
                     const form = quantityStep.form;

@@ -18,7 +18,7 @@
     ]);
 @endphp
 
-@section('policy')
+@section('content')
     <section class="py-7">
         <h2 class="font-serif text-2xl mb-3">Start a return or exchange</h2>
         <p class="text-[15px] leading-relaxed text-ink/80 mb-4">Please contact us to start a return or exchange, and keep your order number handy.</p>

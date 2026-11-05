@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
     protected $fillable = [
     'name', 'slug', 'price', 'description', 'image',
     'stock', 'is_active', 'external_id', 'price_paisa',
-    'image_url', 'category',
+    'image_url', 'category', 'category_id',
 ];
 
     protected $casts = [
@@ -20,6 +21,11 @@ class Product extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function productCategory(): BelongsTo
+    {
+        return $this->belongsTo(ProductCategory::class, 'category_id');
     }
 
     // Frontend display ke liye helper

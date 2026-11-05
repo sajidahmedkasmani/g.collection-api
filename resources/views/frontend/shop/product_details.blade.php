@@ -5,9 +5,9 @@
 @php
     $img   = $product->display_image ?? $product->image ?? ('https://placehold.co/900x1200/F8DCE8/5B1A4A?text=' . urlencode($product->name));
     $price = $product->display_price ?? $product->price;
-    $c     = $product->category ?? null;
-    $cname = is_object($c) ? ($c->name ?? null) : (is_string($c) ? $c : null);
-    $cslug = is_object($c) ? ($c->slug ?? null) : (is_string($c) ? \Illuminate\Support\Str::slug($c) : null);
+    $cname = $product->productCategory?->name ?? $product->category;
+    $cslug = $product->productCategory?->slug ?? (is_string($product->category) ? \Illuminate\Support\Str::slug($product->category) : null);
+    $isWishlisted = in_array($product->id, array_map('intval', session('wishlist', [])), true);
     $desc  = trim((string) ($product->description ?? ''));
     $wa    = 'https://wa.me/923347779231?text=' . urlencode("Hi G. Collection! I'm interested in: {$product->name} (Rs. " . number_format($price) . ") " . url()->current());
 @endphp
@@ -40,6 +40,11 @@
                 <p class="inline-block bg-blush text-plum text-[11px] uppercase tracking-[0.2em] rounded-full px-4 py-1.5 mb-5">{{ $cname }}</p>
             @endif
             <h1 class="font-serif text-4xl md:text-6xl leading-[1.04] mb-5">{{ $product->name }}</h1>
+            <button type="button" data-wishlist-toggle data-product-id="{{ $product->id }}" aria-pressed="{{ $isWishlisted ? 'true' : 'false' }}"
+                    class="inline-flex items-center gap-2 text-sm mb-5 {{ $isWishlisted ? 'text-rose' : 'text-plum' }}">
+                <svg class="w-5 h-5" fill="{{ $isWishlisted ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.3 5.3 0 0 1 12 6a5.3 5.3 0 0 1 9.3 6C19 16.4 12 21 12 21Z"/></svg>
+                <span data-wishlist-label>{{ $isWishlisted ? 'Saved to wishlist' : 'Add to wishlist' }}</span>
+            </button>
             <p class="text-2xl md:text-3xl font-medium text-plum mb-1">Rs. {{ number_format($price) }}</p>
             <p class="text-xs text-muted mb-8">Free shipping on orders of Rs. 10,000 and above</p>
 

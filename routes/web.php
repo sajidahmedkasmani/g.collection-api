@@ -17,6 +17,7 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\Admin\QueueMonitorController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\CatalogController;
+use App\Http\Controllers\WishlistController;
 
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Controllers\CustomerRegisterController;
@@ -40,6 +41,9 @@ use App\Http\Controllers\CustomerProfileController;
         Route::get('/faqs', 'faqs')->name('faqs');
         
     });
+
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/{productId}/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
     // Other pages
         Route::view('/shipping', 'frontend.shipping')->name('shipping');
@@ -161,7 +165,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
 
     Route::controller(CatalogController::class)->group(function() {
-        Route::get('collection', 'index')->name('catalog.collection');
+        Route::get('collections', 'index')->middleware('can:products.view')->name('catalog.index');
+        Route::post('collections', 'storeCollection')->middleware('can:products.create')->name('catalog.collections.store');
+        Route::post('categories', 'storeCategory')->middleware('can:products.create')->name('catalog.categories.store');
+        Route::post('collections/{collection}/toggle', 'toggleCollection')->middleware('can:products.edit')->name('catalog.collections.toggle');
+        Route::post('categories/{category}/toggle', 'toggleCategory')->middleware('can:products.edit')->name('catalog.categories.toggle');
     });
 
 

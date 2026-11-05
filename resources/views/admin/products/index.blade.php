@@ -6,7 +6,14 @@
     if (method_exists($products, 'withQueryString')) { $products = $products->withQueryString(); }
     $search = trim((string) request('search'));
     $status = request('status');
-    $statusUrl = fn($s) => route('admin.products.index', array_filter(['search' => $search, 'status' => $s]));
+    $collection = request('collection');
+    $category = request('category');
+    $statusUrl = fn($s) => route('admin.products.index', array_filter([
+        'search' => $search,
+        'status' => $s,
+        'collection' => $collection,
+        'category' => $category,
+    ]));
     $grid = 'grid-cols-[auto_minmax(0,1fr)] md:grid-cols-[28px_minmax(0,2.6fr)_110px_110px_150px_84px]';
 @endphp
 
@@ -22,6 +29,8 @@
         <div class="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-4">
             <form method="GET" action="{{ route('admin.products.index') }}" class="flex-1 flex items-center gap-2 bg-lav/70 rounded-2xl pl-4 pr-1.5 py-1.5 focus-within:ring-4 ring-brand-100 transition">
                 @if($status !== null && $status !== '')<input type="hidden" name="status" value="{{ $status }}">@endif
+                @if($collection)<input type="hidden" name="collection" value="{{ $collection }}">@endif
+                @if($category)<input type="hidden" name="category" value="{{ $category }}">@endif
                 <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>
                 <input type="text" name="search" value="{{ $search }}" placeholder="Search products by name..."
                        class="flex-1 min-w-0 bg-transparent text-sm py-2.5 focus:outline-none placeholder:text-gray-400">
@@ -40,6 +49,24 @@
         </div>
 
         <div class="flex items-center justify-between gap-3 flex-wrap">
+            <form method="GET" action="{{ route('admin.products.index') }}" class="flex flex-wrap items-center gap-2">
+                @if($search)<input type="hidden" name="search" value="{{ $search }}">@endif
+                @if($status)<input type="hidden" name="status" value="{{ $status }}">@endif
+                <label class="sr-only" for="product-collection-filter">Collection</label>
+                <select id="product-collection-filter" name="collection" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                    <option value="">All collections</option>
+                    @foreach($collections as $item)
+                        <option value="{{ $item->slug }}" @selected($collection === $item->slug)>{{ $item->name }}</option>
+                    @endforeach
+                </select>
+                <label class="sr-only" for="product-category-filter">Category</label>
+                <select id="product-category-filter" name="category" onchange="this.form.submit()" class="bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs">
+                    <option value="">All categories</option>
+                    @foreach($categories as $item)
+                        <option value="{{ $item->slug }}" @selected($category === $item->slug)>{{ $item->collection->name }} — {{ $item->name }}</option>
+                    @endforeach
+                </select>
+            </form>
             <div class="inline-flex bg-lav/70 rounded-2xl p-1 text-xs">
                 @foreach([null => 'All', 'active' => 'Active', 'inactive' => 'Inactive'] as $val => $label)
                     @php $on = (string) $status === (string) $val; @endphp

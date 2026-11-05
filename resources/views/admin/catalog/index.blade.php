@@ -16,7 +16,7 @@
     </div>
 
     <div class="grid md:grid-cols-2 gap-5">
-        <form method="POST" action="" class="bg-white rounded-2xl p-5 soft space-y-3">
+        <form method="POST" action="{{ route('admin.catalog.collections.store') }}" class="bg-white rounded-2xl p-5 soft space-y-3">
             @csrf
             <h2 class="font-semibold">Add collection</h2>
             <label for="collection-name" class="sr-only">Collection name</label>
@@ -24,7 +24,7 @@
             <button class="btn-bloom text-white px-5 py-2.5 rounded-xl text-xs font-semibold">Create collection</button>
         </form>
 
-        <form method="POST" action="" class="bg-white rounded-2xl p-5 soft space-y-3">
+        <form method="POST" action="{{ route('admin.catalog.categories.store') }}" class="bg-white rounded-2xl p-5 soft space-y-3">
             @csrf
             <h2 class="font-semibold">Add category</h2>
             <label for="category-collection" class="sr-only">Parent collection</label>
@@ -48,7 +48,7 @@
                         <h2 class="font-semibold">{{ $collection->name }}</h2>
                         <p class="text-xs text-gray-500">{{ $collection->categories->count() }} categories · {{ $collection->slug }}</p>
                     </div>
-                    <form method="POST" action="">
+                    <form method="POST" action="{{ route('admin.catalog.collections.toggle', $collection) }}">
                         @csrf
                         <button class="px-3 py-1.5 rounded-full text-xs {{ $collection->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">
                             {{ $collection->is_active ? 'Active · Deactivate' : 'Inactive · Activate' }}
@@ -62,7 +62,7 @@
                                 <span class="text-sm font-medium">{{ $category->name }}</span>
                                 <span class="text-xs text-gray-400 ml-2">{{ $category->slug }}</span>
                             </div>
-                            <form method="POST" action="">
+                            <form method="POST" action="{{ route('admin.catalog.categories.toggle', $category) }}">
                                 @csrf
                                 <button class="px-3 py-1.5 rounded-full text-xs {{ $category->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">
                                     {{ $category->is_active ? 'Active · Deactivate' : 'Inactive · Activate' }}

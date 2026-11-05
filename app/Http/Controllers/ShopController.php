@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use App\Models\CatalogCollection;
 use App\Models\Product;
+use App\Models\ProductCategory;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -15,9 +17,12 @@ class ShopController extends Controller
     public function home()
     {
         $sliders = \App\Models\HomeSlider::active()->get();
-        $products = Product::where('is_active', true)->latest()->take(8)->get();
+        $products = Product::where('is_active', true)->with('productCategory')->latest()->take(8)->get();
         $faqs = \App\Models\Faq::active()->get();
-        return view('frontend.home', compact('products', 'sliders', 'faqs'));
+        $collections = CatalogCollection::with(['categories' => fn ($query) => $query->where('is_active', true)])
+            ->where('is_active', true)->orderBy('name')->get();
+
+        return view('frontend.home', compact('products', 'sliders', 'faqs', 'collections'));
     }
 
     public function about()
@@ -25,10 +30,43 @@ class ShopController extends Controller
         return view('frontend.about');
     }
 
-    public function shop()
+    public function shop(Request $request)
     {
-        $products = Product::where('is_active', true)->latest()->paginate(12);
-        return view('frontend.shop.shop', compact('products'));
+        $query = Product::where('is_active', true)->with('productCategory.collection');
+        $collections = CatalogCollection::where('is_active', true)->orderBy('name')->get();
+        $categories = ProductCategory::where('is_active', true)
+            ->whereHas('collection', fn ($query) => $query->where('is_active', true))
+            ->with('collection')->orderBy('name')->get();
+
+        if ($request->filled('q')) {
+            $term = trim((string) $request->query('q'));
+            $query->where(function ($products) use ($term) {
+                $products->where('name', 'like', "%{$term}%")
+                    ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+
+        if ($request->filled('collection')) {
+            $query->whereHas('productCategory.collection', fn ($collections) => $collections->where('slug', $request->query('collection')));
+        }
+
+        if ($request->filled('category')) {
+            $category = (string) $request->query('category');
+            $query->where(function ($products) use ($category) {
+                $products->whereHas('productCategory', fn ($categories) => $categories->where('slug', $category))
+                    ->orWhere('category', $category);
+            });
+        }
+
+        match ($request->query('sort', 'newest')) {
+            'price_asc' => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
+            default => $query->latest(),
+        };
+
+        $products = $query->paginate(12)->withQueryString();
+
+        return view('frontend.shop.shop', compact('products', 'collections', 'categories'));
     }
 
     public function product_details($slug)

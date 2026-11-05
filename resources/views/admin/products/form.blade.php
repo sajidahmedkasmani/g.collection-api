@@ -6,8 +6,8 @@
     $currentImage = $product->image
         ? (str_starts_with($product->image, 'http') ? $product->image : asset('storage/' . $product->image))
         : '';
-    $cats = ['' => 'None', 'stitched' => 'Stitched', 'unstitched' => 'Unstitched', 'accessories' => 'Accessories', 'other' => 'Other'];
-    $selectedCat = (string) old('category', $product->category);
+    $legacyCategory = $categories->firstWhere('slug', $product->category);
+    $selectedCategoryId = old('category_id', $product->category_id ?: $legacyCategory?->id);
 @endphp
 
 <form action="{{ $product->exists ? route('admin.products.update', $product) : route('admin.products.store') }}"
@@ -83,19 +83,21 @@
                     </label>
                 </div>
 
-                <div>
+                <label class="block">
                     <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Category</span>
-                    <div class="flex flex-wrap gap-2 mt-2">
-                        @foreach($cats as $val => $label)
-                            <label class="cursor-pointer">
-                                <input type="radio" name="category" value="{{ $val }}" class="peer sr-only" @checked($selectedCat === (string) $val)>
-                                <span class="inline-block text-xs rounded-full border border-gray-200 px-4 py-2.5 transition hover:border-brand-200
-                                             peer-checked:bg-brand-600 peer-checked:text-white peer-checked:border-brand-600 peer-checked:shadow-md peer-checked:shadow-brand-600/25">{{ $label }}</span>
-                            </label>
+                    <select name="category_id" class="mt-2 w-full border border-gray-200 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 focus:ring-4 ring-brand-100 transition">
+                        <option value="">No category</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" @selected((string) $selectedCategoryId === (string) $category->id)>
+                                {{ $category->collection->name }} — {{ $category->name }}{{ $category->is_active ? '' : ' (Inactive)' }}
+                            </option>
                         @endforeach
-                    </div>
-                    @error('category') <p class="text-rose-500 text-xs mt-1.5">{{ $message }}</p> @enderror
-                </div>
+                    </select>
+                    @error('category_id') <p class="text-rose-500 text-xs mt-1.5">{{ $message }}</p> @enderror
+                    @if($categories->isEmpty())
+                        <p class="text-xs text-gray-400 mt-2">Create a collection and category first.</p>
+                    @endif
+                </label>
 
                 <label class="block" x-data="{ n: @js(strlen((string) old('description', $product->description ?? ''))) }">
                     <span class="flex items-center justify-between">

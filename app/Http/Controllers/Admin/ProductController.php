@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CatalogCollection;
+use App\Models\ProductCategory;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -12,41 +14,36 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        // $query = Product::query();
-
-        // if ($request->filled('search')) {
-        //     $query->where('name', 'like', '%' . $request->search . '%');
-        // }
-        // if ($request->filled('status')) {
-        //     $query->where('is_active', $request->status === 'active');
-        // }
-
-        // $products = $query->latest()->paginate(15)->withQueryString();
-
         $query = Product::query();
 
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->string('search') . '%');
+        }
+        if ($request->filled('status') && in_array($request->status, ['active', 'inactive'], true)) {
+            $query->where('is_active', $request->status === 'active');
+        }
         if ($request->filled('category')) {
-            $query->whereHas('category', fn($q) => $q->where('slug', $request->category));
-            // agar category sirf ek column hai: $query->where('category', $request->category);
+            $query->where(function ($products) use ($request) {
+                $products->whereHas('productCategory', fn ($categories) => $categories->where('slug', $request->category))
+                    ->orWhere('category', $request->category);
+            });
         }
-        if ($request->filled('q')) {
-            $query->where('name', 'like', '%' . $request->q . '%');
+        if ($request->filled('collection')) {
+            $query->whereHas('productCategory.collection', fn ($collections) => $collections->where('slug', $request->collection));
         }
-        match ($request->get('sort', 'newest')) {
-            'price_asc'  => $query->orderBy('price'),
-            'price_desc' => $query->orderByDesc('price'),
-            default      => $query->latest(),
-        };
 
-        $products = $query->paginate(12)->withQueryString();
+        $products = $query->latest()->paginate(15)->withQueryString();
+        $collections = CatalogCollection::orderBy('name')->get();
+        $categories = ProductCategory::with('collection')->orderBy('name')->get();
 
-        return view('admin.products.index', compact('products'));
-        
+        return view('admin.products.index', compact('products', 'collections', 'categories'));
     }
 
     public function create()
     {
-        return view('admin.products.form', ['product' => new Product()]);
+        $categories = ProductCategory::with('collection')->orderBy('name')->get();
+
+        return view('admin.products.form', ['product' => new Product(), 'categories' => $categories]);
     }
 
     public function store(Request $request)
@@ -65,7 +62,9 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        return view('admin.products.form', compact('product'));
+        $categories = ProductCategory::with('collection')->orderBy('name')->get();
+
+        return view('admin.products.form', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
@@ -122,12 +121,14 @@ class ProductController extends Controller
         'image' => 'nullable|string',
         'image_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
         'stock' => 'nullable|integer|min:0',
-        'category' => 'nullable|string|max:40',
+        'category_id' => 'nullable|integer|exists:product_categories,id',
         'is_active' => 'nullable|boolean',
     ]);
 
     $data['is_active'] = $request->boolean('is_active');
-    $data['price_paisa'] = (int) round($request->price * 100);   // <-- YEH LINE ADD KARO
+    $data['price_paisa'] = (int) round($request->price * 100);
+    $category = isset($data['category_id']) ? ProductCategory::findOrFail($data['category_id']) : null;
+    $data['category'] = $category?->slug;
 
     unset($data['image_file']);
     return $data;
@@ -213,6 +214,7 @@ class ProductController extends Controller
                     'image_url'   => $image ?: null,
                     'stock'       => $stock !== '' ? (int) $stock : null,
                     'category'    => $category,
+                    'category_id' => ProductCategory::where('slug', $category)->value('id'),
                     'is_active'   => $isActive,
                 ];
 
