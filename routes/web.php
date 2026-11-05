@@ -14,6 +14,8 @@ use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\NewsletterCampaignController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\Admin\QueueMonitorController;
+use App\Http\Controllers\Admin\PermissionController;
 
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Controllers\CustomerRegisterController;
@@ -82,6 +84,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
         Route::patch('products/{product}', [ProductController::class, 'update']);
     });
+
     Route::delete('products/bulk-delete', [ProductController::class, 'bulkDelete'])
         ->middleware('can:products.bulk-delete')->name('products.bulk-delete');
     Route::delete('products/{product}', [ProductController::class, 'destroy'])
@@ -93,19 +96,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     });
-    Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])
-        ->middleware('can:orders.edit')->name('orders.status');
 
-    Route::get('settings', [SettingController::class, 'edit'])
-        ->middleware('can:settings.view')->name('settings.edit');
-    Route::post('settings', [SettingController::class, 'update'])
-        ->middleware('can:settings.edit')->name('settings.update');
+    Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->middleware('can:orders.edit')->name('orders.status');
+
+    Route::controller(SettingController::class)->group(function() {
+        Route::get('settings', 'edit')->middleware('can:settings.view')->name('settings.edit');
+        Route::post('settings', 'update')->middleware('can:settings.edit')->name('settings.update');
+    });
 
     // Website CMS & Content
-    Route::get('cms', [CmsController::class, 'index'])
-        ->middleware('can:cms.view')->name('cms.index');
-    Route::post('cms', [CmsController::class, 'update'])
-        ->middleware('can:cms.edit')->name('cms.update');
+    Route::controller(CmsController::class)->group(function() {
+        Route::get('cms', 'index')->middleware('can:cms.view')->name('cms.index');
+        Route::post('cms', 'update')->middleware('can:cms.edit')->name('cms.update');
+    });
 
     // FAQs CMS
     Route::get('faqs', [FaqController::class, 'index'])->middleware('can:faqs.view')->name('faqs.index');
@@ -137,24 +140,28 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])
         ->name('users.toggle-active')->middleware('can:users.toggle-active');
 
-    Route::get('permissions', [App\Http\Controllers\Admin\PermissionController::class, 'index'])
-        ->middleware('can:users.edit')->name('permissions.index');
-    Route::post('permissions', [App\Http\Controllers\Admin\PermissionController::class, 'store'])
-        ->middleware('can:users.edit')->name('permissions.store');
-    Route::post('permissions/{permission}/toggle-active', [App\Http\Controllers\Admin\PermissionController::class, 'toggleActive'])
-        ->middleware('can:users.edit')->name('permissions.toggle-active');
 
-    Route::get('newsletters', [NewsletterCampaignController::class, 'index'])
-        ->middleware('can:newsletter.manage')->name('newsletters.index');
-    Route::post('newsletters', [NewsletterCampaignController::class, 'store'])
-        ->middleware('can:newsletter.manage')->name('newsletters.store');
-    Route::post('newsletters/{campaign}/send-now', [NewsletterCampaignController::class, 'sendNow'])
-        ->middleware('can:newsletter.manage')->name('newsletters.send-now');
+    Route::controller(PermissionController::class)->group(function() {
+        Route::get('permissions', 'index')->middleware('can:users.edit')->name('permissions.index');
+        Route::post('permissions', 'store')->middleware('can:users.edit')->name('permissions.store');
+        Route::post('permissions/{permission}/toggle-active', 'toggleActive')->middleware('can:users.edit')->name('permissions.toggle-active');
+    });
 
-    Route::get('queue-monitor', [App\Http\Controllers\Admin\QueueMonitorController::class, 'index'])
-        ->middleware('can:queue.view')->name('queue.monitor');
-    Route::post('queue-monitor/retry', [App\Http\Controllers\Admin\QueueMonitorController::class, 'retryFailed'])
-        ->middleware('can:queue.retry')->name('queue.retry');
+
+    Route::controller(NewsletterCampaignController::class)->group(function() {
+        Route::get('newsletters', 'index')->middleware('can:newsletter.manage')->name('newsletters.index');
+        Route::post('newsletters', 'store')->middleware('can:newsletter.manage')->name('newsletters.store');
+        Route::post('newsletters/{campaign}/send-now', 'sendNow')->middleware('can:newsletter.manage')->name('newsletters.send-now');
+    });
+
+    Route::controller(QueueMonitorController::class)->group(function() {
+        Route::get('queue-monitor', 'index')->middleware('can:queue.view')->name('queue.monitor');
+        Route::post('queue-monitor/retry', 'retryFailed')>middleware('can:queue.retry')->name('queue.retry');
+    });
+
+    Route::controller(CatalogController::class)->group(function() {
+        Route::get('/collection', 'index')->name('catalog.collection');
+    });
 
 
 });
