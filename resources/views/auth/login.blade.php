@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }} – Log in</title>
+    <title>{{ config('app.name', 'G. Collection') }} – Log in</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -179,167 +179,167 @@
     </style>
 </head>
 <body>
-<div class="page">
+    <div class="page">
 
-    <!-- Left: animated characters -->
-    <section class="stage-panel" aria-hidden="true">
-        <div class="aurora"><span></span><span></span><span></span></div>
+        <!-- Left: animated characters -->
+        <section class="stage-panel" aria-hidden="true">
+            <div class="aurora"><span></span><span></span><span></span></div>
 
-        <div class="brand"><i></i>{{ config('app.name', 'Laravel') }}</div>
+            <div class="brand"><i></i>{{ config('app.name', 'G. Collection') }}</div>
 
-        <div class="stage-wrap">
-            <div class="stage" id="stage">
-                <div class="char c-violet">
-                    <div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>
-                </div>
-                <div class="char c-ink">
-                    <div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>
-                </div>
-                <div class="char c-coral">
-                    <div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>
-                </div>
-                <div class="char c-sun">
-                    <div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>
-                    <div class="mouth"></div>
+            <div class="stage-wrap">
+                <div class="stage" id="stage">
+                    <div class="char c-violet">
+                        <div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>
+                    </div>
+                    <div class="char c-ink">
+                        <div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>
+                    </div>
+                    <div class="char c-coral">
+                        <div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>
+                    </div>
+                    <div class="char c-sun">
+                        <div class="eyes"><div class="eye"><div class="pupil"></div></div><div class="eye"><div class="pupil"></div></div></div>
+                        <div class="mouth"></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="tagline">
-            <h2>Aapka kaam intezaar kar raha hai.</h2>
-            <p>Log in karein aur wahin se shuru karein jahan chhora tha.</p>
-        </div>
-    </section>
+            <div class="tagline">
+                <h2>Your work is waiting.</h2>
+                <p>Log in and start from where you left off..</p>
+            </div>
+        </section>
 
-    <!-- Right: form -->
-    <main class="form-panel">
-        <div class="card" id="card">
-            <h1>Welcome back</h1>
-            <p class="sub">Log in to continue to your account.</p>
+        <!-- Right: form -->
+        <main class="form-panel">
+            <div class="card" id="card">
+                <h1>Welcome back</h1>
+                <p class="sub">Log in to continue to your account.</p>
 
-            @if (session('status'))
-                <div class="status" role="status">{{ session('status') }}</div>
+                @if (session('status'))
+                    <div class="status" role="status">{{ session('status') }}</div>
+                @endif
+
+                <form method="POST" action="{{ route('login') }}" id="loginForm">
+                    @csrf
+
+                    <div class="field">
+                        <label for="email">{{ __('Email') }}</label>
+                        <div class="control">
+                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="you@example.com">
+                        </div>
+                        @error('email') <p class="err">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="field">
+                        <label for="password">{{ __('Password') }}</label>
+                        <div class="control has-toggle">
+                            <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
+                            <button type="button" class="toggle" id="toggle" aria-label="Show password" aria-pressed="false">
+                                <svg class="on-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 19C5 19 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.9 10.9 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/></svg>
+                            </button>
+                        </div>
+                        @error('password') <p class="err">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="row">
+                        <label class="check" for="remember_me">
+                            <input id="remember_me" type="checkbox" name="remember">
+                            <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>
+                            {{ __('Remember me') }}
+                        </label>
+
+                        @if (Route::has('password.request'))
+                            <a class="forgot" href="{{ route('password.request') }}">{{ __('Forgot your password?') }}</a>
+                        @endif
+                    </div>
+
+                    <button type="submit" class="btn" id="submitBtn">
+                        <span class="label">{{ __('Log in') }}</span>
+                        <span class="spin" aria-hidden="true"></span>
+                    </button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        (function () {
+            var stage = document.getElementById('stage');
+            var pass = document.getElementById('password');
+            var toggle = document.getElementById('toggle');
+            var form = document.getElementById('loginForm');
+            var btn = document.getElementById('submitBtn');
+            var card = document.getElementById('card');
+            var email = document.getElementById('email');
+            var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            var eyes = Array.prototype.slice.call(document.querySelectorAll('.eye'));
+
+            // Pupils follow the cursor
+            function look(x, y) {
+                eyes.forEach(function (eye) {
+                    var r = eye.getBoundingClientRect();
+                    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+                    var a = Math.atan2(y - cy, x - cx);
+                    var d = Math.min(5, Math.hypot(x - cx, y - cy) / 25);
+                    eye.firstElementChild.style.transform = 'translate(' + Math.cos(a) * d + 'px,' + Math.sin(a) * d + 'px)';
+                });
+            }
+            if (!reduce) {
+                document.addEventListener('mousemove', function (e) { look(e.clientX, e.clientY); });
+                // When typing the email, look toward the field
+                email.addEventListener('input', function () {
+                    var r = email.getBoundingClientRect();
+                    var p = Math.min(1, email.value.length / 24);
+                    look(r.left + r.width * p, r.top + r.height / 2);
+                });
+            }
+
+            // Shy mode: close eyes while a hidden password is focused
+            function sync() {
+                var hidden = pass.type === 'password';
+                stage.classList.toggle('shy', document.activeElement === pass && hidden);
+                stage.classList.toggle('peek', !hidden);
+            }
+            pass.addEventListener('focus', sync);
+            pass.addEventListener('blur', sync);
+
+            toggle.addEventListener('click', function () {
+                var show = pass.type === 'password';
+                pass.type = show ? 'text' : 'password';
+                toggle.classList.toggle('on', show);
+                toggle.setAttribute('aria-pressed', String(show));
+                toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+                pass.focus();
+                sync();
+            });
+
+            // Random blink
+            if (!reduce) {
+                (function blink() {
+                    setTimeout(function () {
+                        if (!stage.classList.contains('shy')) {
+                            stage.classList.add('blink');
+                            setTimeout(function () { stage.classList.remove('blink'); }, 150);
+                        }
+                        blink();
+                    }, 2500 + Math.random() * 3000);
+                })();
+            }
+
+            // Loading state on submit
+            form.addEventListener('submit', function () {
+                btn.classList.add('loading');
+                btn.setAttribute('aria-busy', 'true');
+            });
+
+            // Shake the card if the server returned errors
+            @if ($errors->any())
+                card.classList.add('shake');
             @endif
-
-            <form method="POST" action="{{ route('login') }}" id="loginForm">
-                @csrf
-
-                <div class="field">
-                    <label for="email">{{ __('Email') }}</label>
-                    <div class="control">
-                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" placeholder="you@example.com">
-                    </div>
-                    @error('email') <p class="err">{{ $message }}</p> @enderror
-                </div>
-
-                <div class="field">
-                    <label for="password">{{ __('Password') }}</label>
-                    <div class="control has-toggle">
-                        <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
-                        <button type="button" class="toggle" id="toggle" aria-label="Show password" aria-pressed="false">
-                            <svg class="on-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 19C5 19 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A10.9 10.9 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/></svg>
-                        </button>
-                    </div>
-                    @error('password') <p class="err">{{ $message }}</p> @enderror
-                </div>
-
-                <div class="row">
-                    <label class="check" for="remember_me">
-                        <input id="remember_me" type="checkbox" name="remember">
-                        <span class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>
-                        {{ __('Remember me') }}
-                    </label>
-
-                    @if (Route::has('password.request'))
-                        <a class="forgot" href="{{ route('password.request') }}">{{ __('Forgot your password?') }}</a>
-                    @endif
-                </div>
-
-                <button type="submit" class="btn" id="submitBtn">
-                    <span class="label">{{ __('Log in') }}</span>
-                    <span class="spin" aria-hidden="true"></span>
-                </button>
-            </form>
-        </div>
-    </main>
-</div>
-
-<script>
-(function () {
-    var stage = document.getElementById('stage');
-    var pass = document.getElementById('password');
-    var toggle = document.getElementById('toggle');
-    var form = document.getElementById('loginForm');
-    var btn = document.getElementById('submitBtn');
-    var card = document.getElementById('card');
-    var email = document.getElementById('email');
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var eyes = Array.prototype.slice.call(document.querySelectorAll('.eye'));
-
-    // Pupils follow the cursor
-    function look(x, y) {
-        eyes.forEach(function (eye) {
-            var r = eye.getBoundingClientRect();
-            var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-            var a = Math.atan2(y - cy, x - cx);
-            var d = Math.min(5, Math.hypot(x - cx, y - cy) / 25);
-            eye.firstElementChild.style.transform = 'translate(' + Math.cos(a) * d + 'px,' + Math.sin(a) * d + 'px)';
-        });
-    }
-    if (!reduce) {
-        document.addEventListener('mousemove', function (e) { look(e.clientX, e.clientY); });
-        // When typing the email, look toward the field
-        email.addEventListener('input', function () {
-            var r = email.getBoundingClientRect();
-            var p = Math.min(1, email.value.length / 24);
-            look(r.left + r.width * p, r.top + r.height / 2);
-        });
-    }
-
-    // Shy mode: close eyes while a hidden password is focused
-    function sync() {
-        var hidden = pass.type === 'password';
-        stage.classList.toggle('shy', document.activeElement === pass && hidden);
-        stage.classList.toggle('peek', !hidden);
-    }
-    pass.addEventListener('focus', sync);
-    pass.addEventListener('blur', sync);
-
-    toggle.addEventListener('click', function () {
-        var show = pass.type === 'password';
-        pass.type = show ? 'text' : 'password';
-        toggle.classList.toggle('on', show);
-        toggle.setAttribute('aria-pressed', String(show));
-        toggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-        pass.focus();
-        sync();
-    });
-
-    // Random blink
-    if (!reduce) {
-        (function blink() {
-            setTimeout(function () {
-                if (!stage.classList.contains('shy')) {
-                    stage.classList.add('blink');
-                    setTimeout(function () { stage.classList.remove('blink'); }, 150);
-                }
-                blink();
-            }, 2500 + Math.random() * 3000);
         })();
-    }
-
-    // Loading state on submit
-    form.addEventListener('submit', function () {
-        btn.classList.add('loading');
-        btn.setAttribute('aria-busy', 'true');
-    });
-
-    // Shake the card if the server returned errors
-    @if ($errors->any())
-        card.classList.add('shake');
-    @endif
-})();
-</script>
+    </script>
 </body>
 </html>

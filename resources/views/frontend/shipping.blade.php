@@ -1,4 +1,6 @@
-@extends('frontend.policies.layout')
+<!-- @extends('frontend.policies.layout') -->
+@extends('frontend.layout.master')
+
 
 @section('title', 'Shipping information')
 @section('heading', 'Shipping information')

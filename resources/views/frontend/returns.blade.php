@@ -1,4 +1,5 @@
-@extends('frontend.policies.layout')
+<!-- @extends('frontend.policies.layouts') -->
+@extends('frontend.layout.master')
 
 @section('title', 'Returns & exchanges')
 @section('heading', 'Returns & exchanges')
