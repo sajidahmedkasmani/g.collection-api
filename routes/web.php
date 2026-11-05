@@ -157,7 +157,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     Route::controller(QueueMonitorController::class)->group(function() {
         Route::get('queue-monitor', 'index')->middleware('can:queue.view')->name('queue.monitor');
-        Route::post('queue-monitor/retry', 'retryFailed')>middleware('can:queue.retry')->name('queue.retry');
+        Route::post('queue-monitor/retry', 'retryFailed')->middleware('can:queue.retry')->name('queue.retry');
     });
 
     Route::controller(CatalogController::class)->group(function() {
