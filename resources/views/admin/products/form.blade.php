@@ -1,4 +1,4 @@
-@extends('admin.layout')
+@extends('admin.admin_layout.master')
 @section('title', $product->exists ? 'Edit Product' : 'Add Product')
 
 @section('content')
