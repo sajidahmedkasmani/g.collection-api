@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\NewsletterCampaignController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\Admin\QueueMonitorController;
 use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\CatalogController;
 
 use App\Http\Controllers\CustomerAuthController;
 use App\Http\Controllers\CustomerRegisterController;
@@ -160,7 +161,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     });
 
     Route::controller(CatalogController::class)->group(function() {
-        Route::get('/collection', 'index')->name('catalog.collection');
+        Route::get('collection', 'index')->name('catalog.collection');
     });
 
 
