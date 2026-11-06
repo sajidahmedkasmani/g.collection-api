@@ -34,6 +34,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name'          => ['required', 'string', 'max:255'],
             'email'         => ['required', 'email', 'unique:users,email'],
+            'role'          => ['nullable', 'string', 'max:100'],
             'password'      => ['required', 'string', 'min:8', 'confirmed'],
             'is_active'     => ['boolean'],
             'permissions'   => ['nullable', 'array'],
@@ -43,8 +44,10 @@ class UserController extends Controller
         $user = User::create([
             'name'      => $data['name'],
             'email'     => $data['email'],
+            'role'      => $data['role'] ?? null,
             'password'  => Hash::make($data['password']),
             'is_active' => $request->boolean('is_active', true),
+            'is_admin' => 1
         ]);
 
         $user->permissions()->sync($data['permissions'] ?? []);
@@ -66,6 +69,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name'          => ['required', 'string', 'max:255'],
             'email'         => ['required', 'email', 'unique:users,email,' . $user->id],
+            'role'          => ['nullable', 'string', 'max:100'],
             'password'      => ['nullable', 'string', 'min:8', 'confirmed'],
             'is_active'     => ['boolean'],
             'permissions'   => ['nullable', 'array'],
@@ -75,6 +79,7 @@ class UserController extends Controller
         $user->fill([
             'name'      => $data['name'],
             'email'     => $data['email'],
+            'role'      => $data['role'] ?? null,
             'is_active' => $request->boolean('is_active'),
         ]);
 

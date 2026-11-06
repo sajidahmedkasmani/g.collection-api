@@ -29,6 +29,12 @@
             </div>
 
             <div>
+                <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">Role</label>
+                <input type="text" name="role" value="{{ old('role', $user->role ?? '') }}" maxlength="100" placeholder="e.g. Manager, Staff" class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                @error('role') <span class="text-xs text-rose-500 mt-1 block">{{ $message }}</span> @enderror
+            </div>
+
+            <div>
                 <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">
                     Password {{ $isEdit ? '(Optional)' : '*' }}
                 </label>
