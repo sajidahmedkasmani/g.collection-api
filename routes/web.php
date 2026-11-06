@@ -74,7 +74,7 @@ use App\Http\Controllers\CustomerProfileController;
 
 // ===== CMS ADMIN PANEL =====
     Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-        Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard')->middleware('can:admin.dashboard');
+        Route::get('dashboard', [AdminController::class, 'dashboard'])->name('dashboard')->middleware('can:admin.dashboard');
 
         Route::middleware('can:products.view')->group(function () {
             Route::get('products', [ProductController::class, 'index'])->name('products.index');
