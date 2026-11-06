@@ -1,4 +1,4 @@
-@extends('frontend.policies.layout')
+@extends('frontend.partials.page-head-layout')
 
 @section('title', 'Privacy policy')
 @section('heading', 'Privacy policy')

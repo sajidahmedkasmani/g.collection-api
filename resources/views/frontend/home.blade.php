@@ -24,9 +24,6 @@
 
 {{-- ============ DYNAMIC HERO SLIDER ============ --}}
 
-{{-- Inter font (Aesop-style sans-serif) — agar layout ke <head> mein pehle se nahi hai to yeh line wahan rakhein --}}
-{{-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet"> --}}
-
 @if(isset($sliders) && $sliders->count())
 <section x-data="{
     i: 0,
@@ -49,7 +46,6 @@
              style="{{ $slide->background_style }}">
 
             @if($slide->content_type === 'image_only')
-                {{-- IMAGE ONLY MODE --}}
                 <a href="{{ $slide->button_url ?: '#' }}" class="block w-full h-full relative">
                     @if($slide->image_url)
                         <img src="{{ $slide->image_url }}" alt="{{ $slide->title ?? 'Banner' }}"
@@ -58,7 +54,6 @@
                     @endif
                 </a>
             @else
-                {{-- CUSTOM MODE --}}
                 <div class="max-w-7xl mx-auto px-6 pt-14 pb-20 h-full grid md:grid-cols-2 gap-10 items-center
                             {{ $slide->image_position === 'left' ? 'md:[&>*:first-child]:order-2' : '' }}">
 
@@ -67,13 +62,7 @@
                             <p class="text-xs uppercase tracking-[0.2em] opacity-70 mb-4">{{ $slide->subtitle }}</p>
                         @endif
                         @if($slide->title)
-                            <!-- <h1 class="text-5xl md:text-7xl leading-[1.02] font-normal mb-6"
-                                style="font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;"
-                                > -->
-                            <h1 
-                                
-                                class="font-serif italic text-5xl md:text-7xl leading-[1.02] mb-6"
-                                >
+                            <h1 class="font-serif italic text-5xl md:text-7xl leading-[1.02] mb-6">
                                 {!! nl2br(e($slide->title)) !!}
                             </h1>
                         @endif
@@ -116,7 +105,6 @@
         </div>
     @endforeach
 
-    {{-- Navigation --}}
     @if($sliders->count() > 1)
         <div class="absolute right-6 bottom-6 flex items-center gap-2 z-10">
             <button @click="go(i-1)" class="w-9 h-9 rounded-full bg-white/80 hover:bg-white shadow flex items-center justify-center" aria-label="Previous">‹</button>
@@ -130,7 +118,6 @@
     @endif
 </section>
 @else
-    {{-- Fallback hero (no sliders) --}}
     <section class="max-w-7xl mx-auto px-6 pt-16 pb-10">
         <p class="text-xs uppercase tracking-widest text-muted mb-6">Stitched · Unstitched · Karachi</p>
         <h1 class="text-5xl md:text-7xl leading-[1.05] font-normal mb-8 max-w-5xl"
@@ -156,18 +143,7 @@
     </section>
 @endif
 
-
-
-    <section class="max-w-3xl mx-auto px-6 pb-12" id="home-search">
-        <form method="GET" action="{{ route('shop') }}" class="flex items-center gap-3 bg-white rounded-full border border-black/10 p-2 pl-5 shadow-sm focus-within:ring-4 ring-plum/10">
-            <svg class="w-5 h-5 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-            <input type="search" name="q" value="{{ request('q') }}" placeholder="Search products, clothing, bags..." aria-label="Search products"
-                   class="flex-1 min-w-0 bg-transparent py-3 text-sm focus:outline-none">
-            <button type="submit" class="bg-plum text-white text-sm rounded-full px-6 py-3 hover:bg-ink transition">Search</button>
-        </form>
-    </section>
-
-<!-- {{-- ============ COLLECTIONS ============ --}} -->
+<!-- ============ COLLECTIONS ============ -->
     <section class="max-w-7xl mx-auto px-6 py-24">
         <h2 class="font-serif text-5xl md:text-7xl leading-[1.02] mb-6">Explore our collections</h2>
         <p class="text-sm text-muted mb-10">Browse clothing, bags and more by collection and category.</p>
@@ -198,12 +174,10 @@
             @endforeach
         </div>
     </section>
-<!-- {{-- ============ COLLECTIONS ============ --}} -->
-
 
 @if($list->count() && $first)
 
-    <!-- {{-- ============ MOST LOVED ============ --}} -->
+    <!-- ============ MOST LOVED ============ -->
         <section class="max-w-7xl mx-auto px-6 pb-24">
             <div class="grid md:grid-cols-2 gap-10">
                 <a href="{{ route('product.details', $first->slug) }}" class="group block">
@@ -236,9 +210,8 @@
                 </div>
             </div>
         </section>
-    <!-- {{-- ============ MOST LOVED ============ --}} -->
 
-    <!-- {{-- ============ SHOP FROM THE COLLECTION (carousel) ============ --}} -->
+    <!-- ============ SHOP FROM THE COLLECTION ============ -->
         <section class="max-w-7xl mx-auto px-6 pb-24" x-data="{ scroll(d){ $refs.row.scrollBy({left:d*320,behavior:'smooth'}) } }">
             <div class="flex items-center justify-between mb-5">
                 <p class="text-[11px] uppercase tracking-[0.2em] text-muted">Shop from the collection · Swipe or click</p>
@@ -260,10 +233,9 @@
                 @endforeach
             </div>
         </section>
-    <!-- {{-- ============ SHOP FROM THE COLLECTION (carousel) ============ --}} -->
 @endif
 
-<!-- {{-- ============ BIG MARQUEE ============ --}} -->
+<!-- ============ BIG MARQUEE ============ -->
     @php
         $marqueeText = setting('marquee_items', 'Embroidery · Lace · Lawn · Cutwork');
         $marqueeParts = array_filter(array_map('trim', explode('·', $marqueeText)));
@@ -278,9 +250,8 @@
             @endfor
         </div>
     </div>
-<!-- {{-- ============ BIG MARQUEE ============ --}} -->
 
-<!-- {{-- ============ PLUM FEATURE ============ --}} -->
+<!-- ============ PLUM FEATURE ============ -->
     @if($list->count() && $first)
     <section class="bg-plum text-white relative overflow-hidden">
         <p class="absolute -top-6 left-0 font-serif italic text-[220px] leading-none text-white/10 select-none pointer-events-none whitespace-nowrap">{{ setting('plum_watermark', 'Lace. Fringe.') }}</p>
@@ -310,9 +281,8 @@
             </div>
         </div>
     </section>
-<!-- {{-- ============ PLUM FEATURE ============ --}} -->
 
-<!-- {{-- ============ THE EDIT (pink) ============ --}} -->
+<!-- ============ THE EDIT ============ -->
 <section class="bg-blush">
     <div class="max-w-7xl mx-auto px-6 py-24">
         <div class="flex justify-between text-[11px] uppercase tracking-[0.2em] text-plum/70 mb-10">
@@ -348,29 +318,31 @@
     </div>
 </section>
 
-<!-- {{-- ============ FIND YOUR PIECE ============ --}} -->
+<!-- ============ FIND YOUR PIECE (Mobile Optimized) ============ -->
 <section class="bg-ink text-cream" x-data="{ f:'all', hover:0 }">
-    <div class="max-w-7xl mx-auto px-6 py-24">
-        <h2 class="font-serif text-5xl md:text-7xl mb-8">{{ setting('find_piece_title', 'Find your piece.') }}</h2>
-        <div class="flex flex-wrap gap-2 mb-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+        <h2 class="font-serif text-4xl sm:text-5xl md:text-7xl mb-6 md:mb-8">{{ setting('find_piece_title', 'Find your piece.') }}</h2>
+        
+        <div class="flex flex-wrap gap-2 mb-8 md:mb-10">
             @foreach(['all'=>'All','stitched'=>'Stitched','unstitched'=>'Unstitched','accessories'=>'Accessories'] as $k=>$label)
                 <button @click="f='{{ $k }}'" :class="f==='{{ $k }}' ? 'bg-rose text-white' : 'border border-cream/30 text-cream/80'" class="text-xs rounded-full px-4 py-1.5 transition">{{ $label }}</button>
             @endforeach
         </div>
-        <div class="grid md:grid-cols-2 gap-12">
-            <ul>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+            <ul class="w-full">
                 @foreach($list->take(9) as $idx => $p)
                     <li x-show="f==='all' || f==='{{ $cat($p) }}'" @mouseenter="hover={{ $idx }}"
-                        class="flex items-center justify-between gap-4 border-b border-cream/15 py-4">
-                        <a href="{{ route('product.details', $p->slug) }}" class="min-w-0">
-                            <p class="font-serif text-xl truncate hover:text-rose transition">{{ $p->name }}</p>
-                            <p class="text-[11px] text-cream/50 uppercase tracking-widest mt-1">{{ $cat($p) ?: 'Collection' }} · Rs. {{ number_format($p->display_price) }}</p>
+                        class="flex items-center justify-between gap-4 border-b border-cream/15 py-3.5 md:py-4">
+                        <a href="{{ route('product.details', $p->slug) }}" class="min-w-0 flex-1">
+                            <p class="font-serif text-base sm:text-xl truncate hover:text-rose transition">{{ $p->name }}</p>
+                            <p class="text-[10px] sm:text-[11px] text-cream/50 uppercase tracking-widest mt-0.5 sm:mt-1">{{ $cat($p) ?: 'Collection' }} · Rs. {{ number_format($p->display_price) }}</p>
                         </a>
                         <a href="{{ route('product.details', $p->slug) }}" class="shrink-0 bg-white text-ink text-[11px] rounded-full px-3 py-1 hover:bg-rose hover:text-white transition">+ Add</a>
                     </li>
                 @endforeach
             </ul>
-            <div class="hidden md:block relative aspect-[4/5] overflow-hidden rounded-t-[999px] bg-cream/10 self-start sticky top-28">
+            <div class="hidden md:block relative aspect-[4/5] overflow-hidden rounded-t-[999px] bg-cream/10 sticky top-28">
                 @foreach($list->take(9) as $idx => $p)
                     <img x-show="hover==={{ $idx }}" x-transition.opacity src="{{ $ph($p) }}" alt="{{ $p->name }}" class="absolute inset-0 w-full h-full object-cover" loading="lazy">
                 @endforeach
@@ -380,7 +352,7 @@
 </section>
 @endif
 
-<!-- {{-- ============ GOOD TO KNOW ============ --}} -->
+<!-- ============ GOOD TO KNOW ============ -->
     <section class="bg-cream text-black border-t border-cream/10">
         <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12">
             <div>
@@ -405,9 +377,8 @@
             </div>
         </div>
     </section>
-<!-- {{-- ============ GOOD TO KNOW ============ --}} -->
 
-<!-- {{-- ============ FAQ ============ --}} -->
+<!-- ============ FAQ ============ -->
     @php
         $faqList = isset($faqs) ? $faqs : \App\Models\Faq::active()->get();
         $faqCategories = $faqList->pluck('category')->unique()->values();
@@ -459,9 +430,8 @@
             </div>
         </div>
     </section>
-<!-- {{-- ============ FAQ ============ --}} -->
 
-<!-- {{-- ============ NEWSLETTER ============ --}} -->
+<!-- ============ NEWSLETTER ============ -->
     <section class="bg-blush">
         <div class="max-w-7xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -485,6 +455,5 @@
             </div>
         </div>
     </section>
-<!-- {{-- ============ NEWSLETTER ============ --}} -->
 
 @endsection

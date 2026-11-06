@@ -1,4 +1,4 @@
-@extends('frontend.policies.layout')
+@extends('frontend.partials.page-head-layout')
 
 @section('title', 'Returns & exchanges')
 @section('heading', 'Returns & exchanges')

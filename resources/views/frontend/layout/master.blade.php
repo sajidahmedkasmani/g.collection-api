@@ -6,7 +6,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#FAF7F2">
     <meta name="google-site-verification" content="34nT_JEFzVeXLPCWFWLIy66AtSTk3QgX34tg0nbr8uw" />
-    <!-- <title>G.Collection | Women's Clothing & Bags Online in Pakistan</title> -->
     <meta name="title" content="G.Collection | Women's Clothing & Bags Online in Pakistan">
     <meta name="description" content="Shop stylish women's clothing, handbags and fashion accessories at G.Collection. Discover the latest fashion trends with delivery across Pakistan.">
     <title>@yield('title', 'G. Collection — Wear the Story, Every Stitch')</title>
@@ -15,14 +14,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
     <link rel="manifest" href="assets/favicon/site.webmanifest">
-
-
-    
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
@@ -32,11 +27,9 @@
             theme: {
                 extend: {
                     colors: {
-                        // cream: '#FAF7F2',
                         cream: 'rgb(250 243 234)',
                         ink: '#1F1215',
                         plum: '#5B1A4A',
-                        // rose is a full scale now, so both `text-rose` and `bg-rose-600` work
                         rose: {
                             DEFAULT: '#D9558A',
                             50: '#FDF2F7', 100: '#F8DCE8', 200: '#F2BAD1', 300: '#EA93B6', 400: '#E174A0',
@@ -58,8 +51,6 @@
 
     <style>
         [x-cloak]{display:none!important}
-        /* Anything wider than the screen (sliders, marquees) must never widen the page:
-           otherwise Chrome zooms out and fixed bars/menus stretch past the content. */
         html{overflow-x:hidden;max-width:100%}
         body{background:#FAF7F2;color:#1F1215;overflow-x:clip;max-width:100%;position:relative}
         .marquee{display:flex;width:max-content;animation:marquee 40s linear infinite}
@@ -74,7 +65,6 @@
         .nav-link:hover::after,.nav-link.active::after{transform:scaleX(1)}
         @media (prefers-reduced-motion:reduce){.marquee{animation:none}*{transition-duration:.01ms!important}}
     </style>
-
     
     @stack('head')
     <!-- Google tag (gtag.js) -->
@@ -83,16 +73,15 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-TK2W4MDWHH');
     </script>
 </head>
 
 <body class="font-sans antialiased"
-      x-data="{ menu:false, cart:false, acc:false }"
+      x-data="{ menu:false, cart:false, acc:false, searchModal:false }"
       x-init="if (sessionStorage.getItem('gc_cart')) { sessionStorage.removeItem('gc_cart'); cart = true }"
-      @keydown.escape.window="menu=false; cart=false; acc=false"
-      :class="(menu || cart) ? 'overflow-hidden' : ''">
+      @keydown.escape.window="menu=false; cart=false; acc=false; searchModal=false"
+      :class="(menu || cart || searchModal) ? 'overflow-hidden' : ''">
 
     @php
         $gcCart  = session('cart', []);
@@ -118,7 +107,6 @@
                 {{ setting('announcement_text', 'Free shipping on orders above Rs. 10,000') }}
             </div>
         @endif
-    <!-- ANNOUNCEMENT BAR -->
 
     <!-- HEADER -->
     <header class="bg-cream/95 backdrop-blur border-b border-black/10 sticky top-0 z-50">
@@ -132,15 +120,16 @@
             </nav>
 
             <div class="flex items-center gap-4 sm:gap-5">
-                <a href="{{ route('home') }}#home-search" aria-label="Search products" class="hover:text-rose transition">
+                <!-- Search Button to trigger dropdown/modal search -->
+                <button type="button" @click="searchModal = !searchModal" aria-label="Search products" class="hover:text-rose transition focus:outline-none">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-                </a>
+                </button>
+
                 <a href="{{ route('wishlist.index') }}" aria-label="Wishlist, {{ $gcWishlistCount }} items" class="relative hover:text-rose transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9A5.3 5.3 0 0 1 12 6a5.3 5.3 0 0 1 9.3 6C19 16.4 12 21 12 21Z"/></svg>
                     <span data-wishlist-count class="absolute -top-2 -right-2 {{ $gcWishlistCount ? '' : 'hidden' }} bg-rose text-white text-[10px] rounded-full min-w-4 h-4 px-1 flex items-center justify-center">{{ $gcWishlistCount }}</span>
                 </a>
 
-                {{-- Cart (on mobile it lives in the bottom bar, except on cart/checkout pages where the bar is hidden) --}}
                 <a href="{{ route('cart.index') }}" aria-label="Cart, {{ $gcCount }} items"
                    class="relative hover:text-rose transition {{ $gcSkipDrawer ? '' : 'hidden md:block' }}"
                    @unless($gcSkipDrawer) @click.prevent="cart = true; menu = false" @endunless>
@@ -150,11 +139,9 @@
                     @endif
                 </a>
 
-                {{-- Account --}}
                 @if($customer)
                     <a href="{{ route('customer.dashboard') }}" aria-label="My account" class="{{ $gcSkipDrawer ? 'md:hidden' : 'hidden' }} hover:text-rose transition">{!! $userSvg !!}</a>
 
-                    {{-- Desktop: hover card --}}
                     <div class="relative hidden md:block"
                          @mouseenter="acc = true" @mouseleave="acc = false"
                          @focusin="acc = true" @focusout="if (!$el.contains($event.relatedTarget)) acc = false">
@@ -203,6 +190,27 @@
                 @endif
             </div>
         </div>
+
+        <!-- Interactive Header Search Dropdown/Modal matching user's image request -->
+        <div x-cloak x-show="searchModal" x-transition.opacity class="bg-cream/95 border-t border-black/10 px-4 py-4">
+            <div class="max-w-3xl mx-auto">
+                <form method="GET" action="{{ route('shop') }}" class="flex items-center gap-3 bg-white rounded-full border border-black/10 p-2 pl-5 shadow-sm focus-within:ring-4 ring-plum/10">
+                    <svg class="w-5 h-5 text-muted shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <input type="search" name="q" value="{{ request('q') }}" placeholder="Search products, clothing, bags..." aria-label="Search products"
+                           class="flex-1 min-w-0 bg-transparent py-2 text-sm focus:outline-none">
+                    <button type="submit" class="bg-plum text-white text-xs sm:text-sm rounded-full px-5 sm:px-6 py-2.5 hover:bg-ink transition">Search</button>
+                    <button type="button" @click="searchModal = false" class="p-2 text-muted hover:text-ink" aria-label="Close search">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                    </button>
+                </form>
+                <div class="flex items-center gap-2 mt-3 text-xs text-muted px-2">
+                    <span>Popular:</span>
+                    <a href="{{ route('shop') }}?category=stitched" class="border border-black/15 rounded-full px-3 py-1 hover:border-plum hover:text-plum bg-white">Stitched</a>
+                    <a href="{{ route('shop') }}?category=unstitched" class="border border-black/15 rounded-full px-3 py-1 hover:border-plum hover:text-plum bg-white">Unstitched</a>
+                    <a href="{{ route('shop') }}?category=accessories" class="border border-black/15 rounded-full px-3 py-1 hover:border-plum hover:text-plum bg-white">Accessories</a>
+                </div>
+            </div>
+        </div>
     </header>
 
     @unless($gcSkipDrawer)
@@ -249,7 +257,7 @@
             </ul>
         </nav>
 
-        <!-- MOBILE MENU SHEET (slides up from the bottom, same links as desktop) -->
+        <!-- MOBILE MENU SHEET -->
         <div class="md:hidden fixed inset-0 z-[60]" :class="menu ? '' : 'pointer-events-none'">
             <div x-cloak x-show="menu" x-transition.opacity.duration.250ms class="absolute inset-0 bg-ink/40 backdrop-blur-sm" @click="menu = false"></div>
 
@@ -373,53 +381,46 @@
                     </div>
                 @endif
             </div>
-            <!-- Shop -->
-                <div>
-                    <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Shop</p>
-                    <ul class="space-y-2 text-sm text-cream/80">
-                        <li><a href="{{ route('shop') }}" class="hover:text-rose">All products</a></li>
-                        @foreach($gcCats as $slug => $catLabel)
-                            <li><a href="{{ route('shop') }}?category={{ $slug }}" class="hover:text-rose">{{ $catLabel }}</a></li>
-                        @endforeach
-                    </ul>
-                </div>
-            <!-- Shop -->
 
-            <!-- Customer Support -->
-                <div>
-                    <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Customer support</p>
-                    <ul class="space-y-2 text-sm text-cream/80">
-                        <li><a href="{{ route('contact') }}" class="hover:text-rose">Contact us</a></li>
-                        <li><a href="{{ route('faqs') }}" class="hover:text-rose">FAQs</a></li>
-                        <li><a href="{{ route('shipping') }}" class="hover:text-rose">Shipping information</a></li>
-                        <li><a href="{{ route('returns') }}" class="hover:text-rose">Returns &amp; exchanges</a></li>
-                    </ul>
-                </div>
-            <!-- Customer Support -->
+            <div>
+                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Shop</p>
+                <ul class="space-y-2 text-sm text-cream/80">
+                    <li><a href="{{ route('shop') }}" class="hover:text-rose">All products</a></li>
+                    @foreach($gcCats as $slug => $catLabel)
+                        <li><a href="{{ route('shop') }}?category={{ $slug }}" class="hover:text-rose">{{ $catLabel }}</a></li>
+                    @endforeach
+                </ul>
+            </div>
 
-            <!-- Policies -->
-                <div>
-                    <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Policies</p>
-                    <ul class="space-y-2 text-sm text-cream/80">
-                        <li><a href="{{ route('shipping') }}" class="hover:text-rose">Shipping Policy</a></li>
-                        <li><a href="{{ route('returns') }}" class="hover:text-rose">Returns & Exchanges</a></li>
-                        <li><a href="{{ route('privacy') }}" class="hover:text-rose">Privacy Policy</a></li>
-                        <li><a href="{{ route('terms') }}" class="hover:text-rose">Terms & Conditions</a></li>
-                    </ul>
-                </div>
-            <!-- Policies -->
+            <div>
+                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Customer support</p>
+                <ul class="space-y-2 text-sm text-cream/80">
+                    <li><a href="{{ route('contact') }}" class="hover:text-rose">Contact us</a></li>
+                    <li><a href="{{ route('faqs') }}" class="hover:text-rose">FAQs</a></li>
+                    <li><a href="{{ route('shipping') }}" class="hover:text-rose">Shipping information</a></li>
+                    <li><a href="{{ route('returns') }}" class="hover:text-rose">Returns &amp; exchanges</a></li>
+                </ul>
+            </div>
 
-            <!-- Contact -->
-                <div>
-                    <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Contact</p>
-                    <ul class="space-y-2 text-sm text-cream/80">
-                        <li>{{ setting('contact_address', 'Karachi, Pakistan') }}</li>
-                        <li>{{ setting('contact_hours', 'Mon–Sat, 11:00 AM – 9:00 PM') }}</li>
-                        <li><a href="{{ whatsapp_link() }}" target="_blank" rel="noopener" class="hover:text-rose">WhatsApp {{ setting('contact_phone', '+92 334 7779231') }}</a></li>
-                        <li><a href="mailto:{{ setting('contact_email', 'support@gdotcollection.com') }}" class="hover:text-rose">{{ setting('contact_email', 'support@gdotcollection.com') }}</a></li>
-                    </ul>
-                </div>
-            <!-- Contact -->
+            <div>
+                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Policies</p>
+                <ul class="space-y-2 text-sm text-cream/80">
+                    <li><a href="{{ route('shipping') }}" class="hover:text-rose">Shipping Policy</a></li>
+                    <li><a href="{{ route('returns') }}" class="hover:text-rose">Returns & Exchanges</a></li>
+                    <li><a href="{{ route('privacy') }}" class="hover:text-rose">Privacy Policy</a></li>
+                    <li><a href="{{ route('terms') }}" class="hover:text-rose">Terms & Conditions</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <p class="text-[11px] uppercase tracking-[0.2em] text-rose mb-4">Contact</p>
+                <ul class="space-y-2 text-sm text-cream/80">
+                    <li>{{ setting('contact_address', 'Karachi, Pakistan') }}</li>
+                    <li>{{ setting('contact_hours', 'Mon–Sat, 11:00 AM – 9:00 PM') }}</li>
+                    <li><a href="{{ whatsapp_link() }}" target="_blank" rel="noopener" class="hover:text-rose">WhatsApp {{ setting('contact_phone', '+92 334 7779231') }}</a></li>
+                    <li><a href="mailto:{{ setting('contact_email', 'support@gdotcollection.com') }}" class="hover:text-rose">{{ setting('contact_email', 'support@gdotcollection.com') }}</a></li>
+                </ul>
+            </div>
         </div>
         <div class="border-t border-cream/10 max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between gap-3 text-xs text-cream/50">
             <span>© {{ date('Y') }} {{ setting('copyright_text', 'G. Collection. All rights reserved.') }}</span>
