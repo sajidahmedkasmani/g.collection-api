@@ -4,7 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ config('app.name', 'G. Collection') }} – Log in</title>
+        <title>Forgot Password – {{ config('app.name', 'G. Collection') }}</title>
+
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+        <link rel="manifest" href="/assets/favicon/site.webmanifest">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -144,8 +149,8 @@
             .forgot:hover { text-decoration: underline; text-underline-offset: 3px; }
 
             .btn-back-to {
-                position: relative; overflow: hidden; width: 100%; height: 54px; border: 0; border-radius: 14px; cursor: pointer;
-                padding: 20px;
+                overflow: hidden; width: 100px; height: 54px; border: 0; border-radius: 14px; cursor: pointer;
+                padding: 10px;
                 background: linear-gradient(135deg, var(--violet), #5A3DE0);
                 box-shadow: 0 10px 24px -8px rgba(124,92,255,.7);
                 transition: transform .15s ease, box-shadow .2s ease;

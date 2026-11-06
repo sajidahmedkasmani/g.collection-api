@@ -1,5 +1,5 @@
 @extends('frontend.layout.master')
-@section('title', $product->name . ' — G. Collection')
+@section('title', $product->name)
 
 @section('content')
 @php
@@ -139,7 +139,7 @@
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-x-3 sm:gap-x-5 md:gap-x-6 gap-y-9">
             @foreach($related as $p)
-                @include('partials.product-card', ['p' => $p])
+                @include('frontend.partials.product-card', ['p' => $p])
             @endforeach
         </div>
     </div>
