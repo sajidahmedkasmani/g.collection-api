@@ -10,6 +10,20 @@
         <meta name="description" content="Shop stylish women's clothing, handbags and fashion accessories at G.Collection. Discover the latest fashion trends with delivery across Pakistan.">
         
         <title>@yield('title') | G.Collection — Women's Clothing & Bags Online in Pakistan</title>
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="{{ $title ?? 'G. Collection' }}">
+        <meta property="og:description" content="{{ $description ?? 'Stitched and unstitched ladies clothing from Karachi.' }}">
+        <meta property="og:image" content="{{ $ogImage ?? asset('images/og-default.jpg') }}">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ url()->current() }}">
+        <meta property="twitter:title" content="{{ $title ?? 'G. Collection' }}">
+        <meta property="twitter:description" content="{{ $description ?? 'Stitched and unstitched ladies clothing from Karachi.' }}">
+        <meta property="twitter:image" content="{{ $ogImage ?? asset('images/og-default.jpg') }}">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
