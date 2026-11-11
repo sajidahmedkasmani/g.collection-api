@@ -1,2 +1,29 @@
+# Allow all search engines and AI bots to crawl the site
 User-agent: *
-Disallow:
+Allow: /
+
+# Explicitly allow AI Crawlers (For ChatGPT, Claude, Perplexity)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Disallow shopping cart, checkout, and admin areas (Prevents indexing of private pages)
+Disallow: /cart
+Disallow: /checkout
+Disallow: /account
+Disallow: /admin
+Disallow: /login
+
+# Sitemap Location (Yeh line bohot zaroori hai)
+Sitemap: https://gdotcollection.com/sitemap.xml
