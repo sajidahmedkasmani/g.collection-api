@@ -273,7 +273,7 @@ class ShopController extends Controller
     public function faqs()
     {
         $products = Product::where('is_active', true)->latest()->paginate(12);
-        return view('frontend.faqs', compact('products'));
+        return view('frontend.other_pages.faqs', compact('products'));
     }
     
 
